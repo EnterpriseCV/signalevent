@@ -15,7 +15,7 @@
     <!--用来存放文件信息-->
     <div id="thelist" class="uploader-list"></div>
     <div class="btns">
-        <div id="picker">选择文件</div>
+        <div id="picker">选择事件明细表</div>
         <button id="ctlBtn" class="btn btn-default">开始上传</button>
     </div>
 </div>
@@ -79,8 +79,9 @@
             $percent.css( 'width', percentage * 100 + '%' );
         });
 
-        uploader.on( 'uploadSuccess', function( file ) {
+        uploader.on( 'uploadSuccess', function( file,response ) {
             $( '#'+file.id ).find('p.state').text('已上传');
+            console.log(response);
         });
 
         uploader.on( 'uploadError', function( file ) {
@@ -89,6 +90,15 @@
 
         uploader.on( 'uploadComplete', function( file ) {
             $( '#'+file.id ).find('.progress').fadeOut();
+            for (var i = 0; i < uploader.getFiles().length-1; i++) {
+                // 将图片从上传序列移除
+                uploader.removeFile(uploader.getFiles()[i]);
+                //uploader.removeFile(uploader.getFiles()[i], true);
+                //delete uploader.getFiles()[i];
+                // 将图片从缩略图容器移除
+                var $li = $('#' + uploader.getFiles()[i].id);
+                $li.off().remove();
+            }
         });
 
         $("#ctlBtn").on( 'click', function() {
