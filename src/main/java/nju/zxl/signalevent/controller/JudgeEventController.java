@@ -16,7 +16,6 @@ public class JudgeEventController {
     JudgeEventService jes;
     @RequestMapping(value="/",method = RequestMethod.POST)
     public List<DataSignalBean> judgeEvent(@RequestParam("file") MultipartFile file){
-        System.out.println("???");
         return jes.judgeEvent(file);
     }
 }

@@ -23,12 +23,15 @@ public class JudgeEventServiceImpl implements JudgeEventService{
     EventDao ed;
     @Autowired
     EventRuleDao erd;
+
+    public static List<EventRule> ers=null;
     @Override
     public List<DataSignalBean> judgeEvent(MultipartFile file) {
         List<DataSignalBean> dsList = StaticFileService.getDataSignalFromFile(file);
         for(int i=0;i<dsList.size();i++){
             if(dsList.get(i).getMark()==1)
                 continue;
+
             if(!isSignalNecessary(dsList.get(i).getS()))
                 continue;
 
@@ -76,7 +79,7 @@ public class JudgeEventServiceImpl implements JudgeEventService{
 
 
     private boolean isSignalNecessary(SignalBean signal){
-        List<EventRule> ers = erd.findAll();
+        if(ers==null)ers = erd.findAll();
         for(EventRule e:ers){
             if(e.getType()!=1&&e.getType()!=2)continue;
             String[] signals = e.getSignals().split("\\|");
@@ -90,7 +93,7 @@ public class JudgeEventServiceImpl implements JudgeEventService{
         return false;
     }
     private boolean isSiganlProtected(SignalBean signal){
-        List<EventRule> ers = erd.findAll();
+        if(ers==null)ers = erd.findAll();
         for(EventRule e:ers){
             if(e.getType()==2||e.getType()==4){
                 String[] signals = e.getSignals().split("\\|");
