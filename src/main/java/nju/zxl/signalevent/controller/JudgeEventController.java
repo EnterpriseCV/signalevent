@@ -2,10 +2,8 @@ package nju.zxl.signalevent.controller;
 
 import nju.zxl.signalevent.service.JudgeEventService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @CrossOrigin
 @RestController
@@ -13,8 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class JudgeEventController {
     @Autowired
     JudgeEventService jes;
-    @RequestMapping(value="/",method = RequestMethod.GET)
-    public String judgeEvent(){
-        return jes.sayHi();
+    @RequestMapping(value="/",method = RequestMethod.POST)
+    public String judgeEvent(@RequestParam("file") MultipartFile file){
+        return file.getOriginalFilename();
     }
 }
