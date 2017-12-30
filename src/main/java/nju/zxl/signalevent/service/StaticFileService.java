@@ -2,15 +2,19 @@ package nju.zxl.signalevent.service;
 
 import nju.zxl.signalevent.bean.DataSignalBean;
 import nju.zxl.signalevent.bean.SignalBean;
+import nju.zxl.signalevent.dao.HistoryDao;
 import nju.zxl.signalevent.dao.SignalDao;
+import nju.zxl.signalevent.domain.History;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.PostConstruct;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,9 +24,23 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+
+@Component
 public class StaticFileService {
     @Autowired
-    public static SignalDao sd;
+    private SignalDao sd;
+    @Autowired
+    private HistoryDao hd;
+
+    private static StaticFileService sfs;
+
+    @PostConstruct
+    public void init(){
+        sfs=this;
+        sfs.sd=this.sd;
+        sfs.hd=this.hd;
+    }
+
     public static List<DataSignalBean> getDataSignalFromFile(MultipartFile file){
         ArrayList<DataSignalBean> dslist = new ArrayList<DataSignalBean>();
 
@@ -72,6 +90,35 @@ public class StaticFileService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return dsList;
+    }
+
+    public static List<DataSignalBean> getDataSignalBeanFromHistory(){
+        List<History> histories= sfs.hd.findAll();
+        List<DataSignalBean> dsList = new ArrayList<DataSignalBean>();
+
+        int count = 0;
+
+        for(History h:histories){
+            if(!h.getSignal_fid().isEmpty()&&h.getSignal_fid().contains(",")){
+                DataSignalBean ds = new DataSignalBean();
+                ds.setId(count);
+                ds.setTS_name(h.getTransf());
+                ds.setTime(stringToDate(h.getOccur_time()));
+                ds.setActualEvent(h.getEvent_type());
+                String signals[] = h.getSignal_fid().split(",");
+                SignalBean s = new SignalBean();
+                s.setJg_bh(Integer.parseInt(signals[0]));
+                s.setSb_bh(Integer.parseInt(signals[1]));
+                s.setInfo_bh(Integer.parseInt(signals[2]));
+                s.setAct_bh(Integer.parseInt(signals[3]));
+                ds.setS(s);
+                ds.setMark(0);
+                count++;
+                dsList.add(ds);
+            }
+        }
+
         return dsList;
     }
 

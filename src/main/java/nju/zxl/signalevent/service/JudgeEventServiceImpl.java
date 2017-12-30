@@ -24,10 +24,13 @@ public class JudgeEventServiceImpl implements JudgeEventService{
     @Autowired
     EventRuleDao erd;
 
-    public static List<EventRule> ers=null;
+    private static List<EventRule> ers=null;
     @Override
     public List<DataSignalBean> judgeEvent(MultipartFile file) {
-        List<DataSignalBean> dsList = StaticFileService.getDataSignalFromFile(file);
+
+        //List<DataSignalBean> dsList = StaticFileService.getDataSignalFromFile(file);
+        List<DataSignalBean> dsList = StaticFileService.getDataSignalBeanFromHistory();
+
         for(int i=0;i<dsList.size();i++){
             if(dsList.get(i).getMark()==1)
                 continue;
@@ -40,9 +43,9 @@ public class JudgeEventServiceImpl implements JudgeEventService{
             targetDataSignals.add(ds);
             for(int j=i+1;j<dsList.size();j++){
                 DataSignalBean tempds = dsList.get(j);
-                if(tempds.getMark()==1)continue;
-                if(isSignalNecessary(tempds.getS()))break;
+                if(tempds.getMark()!=0)continue;
                 if(isDataSignalsInOneGroup(ds,tempds)){
+                    if(isSignalNecessary(tempds.getS()))break;
                     targetDataSignals.add(tempds);
                 }
             }
@@ -122,7 +125,7 @@ public class JudgeEventServiceImpl implements JudgeEventService{
         if(!ds1.getTS_name().equals(ds2.getTS_name()))return false;
         if(ds1.getS().getJg_bh()!=ds2.getS().getJg_bh())return false;
         if(Math.abs(ds1.getTime().getTime()-ds2.getTime().getTime())>60000)return false;
-        return false;
+        return true;
     }
 
     private int getStimulatedEventId(List<DataSignalBean> targetDataSignals){
@@ -150,7 +153,7 @@ public class JudgeEventServiceImpl implements JudgeEventService{
 
             for(int i=0;i<signals.length;i++){
                 for(int j=0;j<tsid.length;j++){
-                    if(signals[i]==Integer.toString(tsid[j]))
+                    if(signals[i].equals(Integer.toString(tsid[j])))
                         infovalue += Double.parseDouble(values[i]);
                 }
             }
