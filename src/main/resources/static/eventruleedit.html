@@ -129,7 +129,7 @@
                     console.log(JSON.stringify(neweventrule));
 
                     $.ajax({
-                        url:"http://localhost:8080/data/edit/eventrule",
+                        url:"/data/edit/eventrule",
                         contentType:"application/json;charset=utf-8",
                         method:"post",
                         data:JSON.stringify(neweventrule),
@@ -147,12 +147,11 @@
         });
 
         $.ajax({
-            url:"http://localhost:8080/data/fetch/eventrules",
+            url:"/data/fetch/eventrules",
             method:"get",
             success:function(data){
                 console.log(data);
                 vue.eventrules=data;
-                //$(".footable").footable();
             }
         });
     });
