@@ -1,5 +1,6 @@
 package nju.zxl.signalevent.domain;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -9,6 +10,7 @@ import javax.persistence.Table;
 public class Event {
     @Id
     private int id;
+    @Column(name="`interval`")
     private int interval;
     private int voltage;
     private int equipment;

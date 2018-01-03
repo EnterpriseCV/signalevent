@@ -46,4 +46,8 @@ public class SignalBean {
     public void setAct_bh(int act_bh) {
         this.act_bh = act_bh;
     }
+
+    public String toString(){
+        return xh+","+jg_bh+","+sb_bh+","+info_bh+","+act_bh;
+    }
 }

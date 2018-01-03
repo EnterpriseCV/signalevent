@@ -23,4 +23,5 @@ public class JudgeEventController {
     public List<DataSignalBean> test(){
         return jes.judgeEvent(null);
     }
+
 }

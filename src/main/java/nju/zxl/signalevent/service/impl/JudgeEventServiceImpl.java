@@ -1,4 +1,4 @@
-package nju.zxl.signalevent.service;
+package nju.zxl.signalevent.service.impl;
 
 import nju.zxl.signalevent.bean.DataSignalBean;
 import nju.zxl.signalevent.bean.SignalBean;
@@ -7,6 +7,8 @@ import nju.zxl.signalevent.dao.EventRuleDao;
 import nju.zxl.signalevent.dao.SignalDao;
 import nju.zxl.signalevent.domain.EventRule;
 import nju.zxl.signalevent.domain.Signal;
+import nju.zxl.signalevent.service.JudgeEventService;
+import nju.zxl.signalevent.service.StaticFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class JudgeEventServiceImpl implements JudgeEventService{
+public class JudgeEventServiceImpl implements JudgeEventService {
     @Autowired
     SignalDao sd;
     @Autowired
@@ -27,9 +29,13 @@ public class JudgeEventServiceImpl implements JudgeEventService{
     private static List<EventRule> ers=null;
     @Override
     public List<DataSignalBean> judgeEvent(MultipartFile file) {
-
-        //List<DataSignalBean> dsList = StaticFileService.getDataSignalFromFile(file);
-        List<DataSignalBean> dsList = StaticFileService.getDataSignalBeanFromHistory();
+        List<DataSignalBean> dsList;
+        if(file!=null) {
+            dsList = StaticFileService.getDataSignalFromFile(file);
+        }
+        else{
+            dsList = StaticFileService.getDataSignalBeanFromHistory();
+        }
 
         for(int i=0;i<dsList.size();i++){
             if(dsList.get(i).getMark()==1)
@@ -74,6 +80,8 @@ public class JudgeEventServiceImpl implements JudgeEventService{
                     }
                 }
             }
+
+            System.out.println(ds.getS().toString()+" "+stimulatedEventId);
         }
 
         return dsList;

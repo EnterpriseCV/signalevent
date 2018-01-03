@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>电力信号事件化</title>
+
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+    <script src="js/bootstrap.js"></script>
+
+    <style type="text/css">
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        html,body{
+            height: 100%;
+            width: 100%;
+        }
+        .sidebar-nav{
+            height: 100%;
+            text-align: center;
+            padding: 0px;
+        }
+
+        .sidebar-nav ul{ width:100%;
+            height: 100%; background:#00A2CA;margin:0 auto}
+        .sidebar-nav ul li{ height:60px}
+        .sidebar-nav ul li a{ height:60px; line-height:60px;
+            color:#FFF; font-family:"\5FAE\8F6F\96C5\9ED1"; font-size:16px}
+    </style>
+</head>
+<body class="theme-blue">
+
+    <div class="navbar navbar-default col-lg-12" role="navigation" style="margin:0px;">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="" href="index.html"><span class="navbar-brand"><span class="fa fa-paper-plane"></span> 电力信号事件化</span></a></div>
+
+        <div id="user_profile" class="navbar-collapse collapse" style="height: 1px;">
+          <ul id="main-menu" class="nav navbar-nav navbar-right">
+            <li class="dropdown hidden-xs">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                     <i class="fa fa-caret-down"></i>
+                </a>
+
+              <ul class="dropdown-menu">
+              </ul>
+            </li>
+          </ul>
+
+        </div>
+      </div>
+    
+
+    <div class="sidebar-nav col-lg-2">
+    <ul>
+        <li><a href="signalimport.html" class="nav-header J_menuItem"><i class="fa fa-fw fa-question-circle"></i>信号导入</a></li>
+        <li><a href="eventimport.html"  class="nav-header J_menuItem" ><i class="fa fa-fw fa-briefcase"></i> 事件导入 </a></li>
+        <li><a href="eventruleimport.html"  class="nav-header J_menuItem" ><i class="fa fa-fw fa-briefcase"></i> 事件规则导入 </a></li>
+        <li><a href="judge.html"  class="nav-header J_menuItem" ><i class="fa fa-fw fa-briefcase"></i> 信号判断 </a></li>
+        <li><a href="eventruleedit.html"  class="nav-header J_menuItem" ><i class="fa fa-fw fa-briefcase"></i> 权值编辑 </a></li>
+    </ul>
+    </div>
+
+    <div class="index-content col-lg-10">
+        
+        <div class="row J_mainContent" id="content-main">
+            <iframe id="J_iframe" width="100%" height="100%" src="judge.html" frameborder="0" onload="iframeLoad()" data-id="judge.html"  seamless></iframe>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        $(function(){
+            //菜单点击
+            $(".J_menuItem").on('click',function(){
+                var url = $(this).attr('href');
+                $("#J_iframe").attr('src',url);
+                return false;
+            });
+        });
+        function iframeLoad()
+        {
+            document.getElementById("J_iframe").height=document.documentElement.clientHeight -71;
+        }
+
+
+        // 侧边栏高度
+        function fix_height() {
+            var heightWithoutNavbar = $("body > .index-content").height() - 61;
+            $(".sidebard-panel").css("min-height", heightWithoutNavbar + "px");
+        }
+        fix_height();
+
+        $(window).bind("load resize click scroll", function () {
+            if (!$("body").hasClass('body-small')) {
+                fix_height();
+            }
+        });
+
+        //侧边栏滚动
+        $(window).scroll(function () {
+            if ($(window).scrollTop() > 0 && !$('body').hasClass('fixed-nav')) {
+                $('#right-sidebar').addClass('sidebar-top');
+            } else {
+                $('#right-sidebar').removeClass('sidebar-top');
+            }
+        });
+
+    </script>
+    
+  
+</body></html>
