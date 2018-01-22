@@ -5,8 +5,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="history")
-public class History {
+@Table(name="history_data")
+public class HistoryData {
     @Id
     private int id;
     private String transf;
@@ -24,6 +24,8 @@ public class History {
     private String action_attr;
     private String action_attr_id;
     private String signal_fid;
+    private int handle_tag;
+    private int batch_id;
 
     public String getTemplate_id() {
         return template_id;
@@ -151,5 +153,21 @@ public class History {
 
     public void setSignal_fid(String signal_fid) {
         this.signal_fid = signal_fid;
+    }
+
+    public int getHandle_tag() {
+        return handle_tag;
+    }
+
+    public void setHandle_tag(int handle_tag) {
+        this.handle_tag = handle_tag;
+    }
+
+    public int getBatch_id() {
+        return batch_id;
+    }
+
+    public void setBatch_id(int batch_id) {
+        this.batch_id = batch_id;
     }
 }

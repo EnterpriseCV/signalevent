@@ -8,49 +8,49 @@ import javax.persistence.Table;
 @Table(name="`signal`")
 public class Signal {
     @Id
-    private int xh;
-    private int jg_bh;
-    private int sb_bh;
-    private int info_bh;
-    private int act_bh;
+    private int sid;
+    private int area_id;
+    private int equip_id;
+    private int info_id;
+    private int act_id;
 
-    public int getXh() {
-        return xh;
+    public int getSid() {
+        return sid;
     }
 
-    public void setXh(int xh) {
-        this.xh = xh;
+    public void setSid(int sid) {
+        this.sid = sid;
     }
 
-    public int getJg_bh() {
-        return jg_bh;
+    public int getArea_id() {
+        return area_id;
     }
 
-    public void setJg_bh(int jg_bh) {
-        this.jg_bh = jg_bh;
+    public void setArea_id(int area_id) {
+        this.area_id = area_id;
     }
 
-    public int getSb_bh() {
-        return sb_bh;
+    public int getEquip_id() {
+        return equip_id;
     }
 
-    public void setSb_bh(int sb_bh) {
-        this.sb_bh = sb_bh;
+    public void setEquip_id(int equip_id) {
+        this.equip_id = equip_id;
     }
 
-    public int getInfo_bh() {
-        return info_bh;
+    public int getInfo_id() {
+        return info_id;
     }
 
-    public void setInfo_bh(int info_bh) {
-        this.info_bh = info_bh;
+    public void setInfo_id(int info_id) {
+        this.info_id = info_id;
     }
 
-    public int getAct_bh() {
-        return act_bh;
+    public int getAct_id() {
+        return act_id;
     }
 
-    public void setAct_bh(int act_bh) {
-        this.act_bh = act_bh;
+    public void setAct_id(int act_id) {
+        this.act_id = act_id;
     }
 }

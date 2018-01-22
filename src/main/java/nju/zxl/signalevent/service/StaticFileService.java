@@ -5,8 +5,7 @@ import nju.zxl.signalevent.bean.SignalBean;
 import nju.zxl.signalevent.dao.HistoryDao;
 import nju.zxl.signalevent.dao.SignalDao;
 import nju.zxl.signalevent.domain.Event;
-import nju.zxl.signalevent.domain.EventRule;
-import nju.zxl.signalevent.domain.History;
+import nju.zxl.signalevent.domain.HistoryData;
 import nju.zxl.signalevent.domain.Signal;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
@@ -18,9 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -104,12 +101,12 @@ public class StaticFileService {
     }
 
     public static List<DataSignalBean> getDataSignalBeanFromHistory(){
-        List<History> histories= sfs.hd.findAll();
+        List<HistoryData> histories= sfs.hd.findAll();
         List<DataSignalBean> dsList = new ArrayList<DataSignalBean>();
 
         int count = 0;
 
-        for(History h:histories){
+        for(HistoryData h:histories){
             if(!h.getSignal_fid().isEmpty()&&h.getSignal_fid().contains(",")){
                 DataSignalBean ds = new DataSignalBean();
                 ds.setId(count);

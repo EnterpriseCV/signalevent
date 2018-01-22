@@ -1,6 +1,5 @@
 package nju.zxl.signalevent.domain;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -9,50 +8,67 @@ import javax.persistence.Table;
 @Table(name="`event`")
 public class Event {
     @Id
-    private int id;
-    @Column(name="`interval`")
-    private int interval;
-    private int voltage;
-    private int equipment;
-    private int information;
+    private int eid;
+    private int area_id;
+    private int voltage_id;
+    private int equipment_id;
+    private int info_id;
+    private int type_id;
+    private int rank_id;
 
-    public int getId() {
-        return id;
+    public int getEid() {
+        return eid;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setEid(int eid) {
+        this.eid = eid;
     }
 
-    public int getInterval() {
-        return interval;
+    public int getArea_id() {
+        return area_id;
     }
 
-    public void setInterval(int interval) {
-        this.interval = interval;
+    public void setArea_id(int area_id) {
+        this.area_id = area_id;
     }
 
-    public int getVoltage() {
-        return voltage;
+    public int getVoltage_id() {
+        return voltage_id;
     }
 
-    public void setVoltage(int voltage) {
-        this.voltage = voltage;
+    public void setVoltage_id(int voltage_id) {
+        this.voltage_id = voltage_id;
     }
 
-    public int getEquipment() {
-        return equipment;
+    public int getEquipment_id() {
+        return equipment_id;
     }
 
-    public void setEquipment(int equipment) {
-        this.equipment = equipment;
+    public void setEquipment_id(int equipment_id) {
+        this.equipment_id = equipment_id;
     }
 
-    public int getInformation() {
-        return information;
+    public int getInfo_id() {
+        return info_id;
     }
 
-    public void setInformation(int information) {
-        this.information = information;
+    public void setInfo_id(int info_id) {
+        this.info_id = info_id;
+    }
+
+    public int getType_id() {
+        return type_id;
+    }
+
+    public void setType_id(int type_id) {
+        this.type_id = type_id;
+    }
+
+    public int getRank_id() {
+        return rank_id;
+    }
+
+    public void setRank_id(int rank_id) {
+        this.rank_id = rank_id;
     }
 }

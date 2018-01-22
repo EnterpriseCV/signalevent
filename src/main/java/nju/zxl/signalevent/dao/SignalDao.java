@@ -10,8 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public interface SignalDao extends JpaRepository<Signal,Integer>{
-    public Signal findByXh(int xh);
+    public Signal findBySid(int sid);
 
-    @Query(value = "select s from Signal s where s.jg_bh = :jg_bh and s.sb_bh = :sb_bh and s.info_bh = :info_bh and s.act_bh = :act_bh")
-    public Signal findByInfo(@Param("jg_bh") int jg_bh, @Param("sb_bh")int sb_bh,@Param("info_bh") int info_bh, @Param("act_bh")int act_bh);
+    @Query(value = "select s from Signal s where s.area_id = :area_id and s.equip_id = :equip_id and s.info_id = :info_id and s.act_id = :act_id")
+    public Signal findByInfo(@Param("area_id") int area_id, @Param("equip_id")int equip_id,@Param("info_id") int info_id, @Param("act_id")int act_id);
 }
