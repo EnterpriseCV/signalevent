@@ -66,19 +66,26 @@ public class StaticFileService {
             sheet = wb.getSheetAt(i);
             for(int j=sheet.getFirstRowNum()+1;j<=sheet.getLastRowNum();j++){
                 Row r = sheet.getRow(j);
+                if(r.getLastCellNum()<16)continue;
                 if(r.getCell(16).getStringCellValue().contains(",")){
                     DataSignalBean ds = new DataSignalBean();
                     ds.setId(count);
-                    ds.setTS_name(r.getCell(1).getStringCellValue());
+                    if(r.getCell(1)!=null) {
+                        ds.setTS_name(r.getCell(1).getStringCellValue());
+                    }
+                    if(r.getCell(3)!=null)
                     ds.setTime((r.getCell(3).getDateCellValue()));
+                    if(r.getCell(6)!=null)
                     ds.setActualEvent(r.getCell(6).getStringCellValue());
-                    String signals[] = r.getCell(16).getStringCellValue().split(",");
-                    SignalBean s = new SignalBean();
-                    s.setJg_bh(Integer.parseInt(signals[0]));
-                    s.setSb_bh(Integer.parseInt(signals[1]));
-                    s.setInfo_bh(Integer.parseInt(signals[2]));
-                    s.setAct_bh(Integer.parseInt(signals[3]));
-                    ds.setS(s);
+                    if(r.getCell(16)!=null) {
+                        String signals[] = r.getCell(16).getStringCellValue().split(",");
+                        SignalBean s = new SignalBean();
+                        s.setJg_bh(Integer.parseInt(signals[0]));
+                        s.setSb_bh(Integer.parseInt(signals[1]));
+                        s.setInfo_bh(Integer.parseInt(signals[2]));
+                        s.setAct_bh(Integer.parseInt(signals[3]));
+                        ds.setS(s);
+                    }
                     ds.setMark(0);
                     count++;
                     dsList.add(ds);

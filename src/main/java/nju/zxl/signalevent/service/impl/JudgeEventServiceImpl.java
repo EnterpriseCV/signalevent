@@ -78,9 +78,9 @@ public class JudgeEventServiceImpl implements JudgeEventService {
                 }
             }
 
-            System.out.println(ds.getS().toString()+" "+stimulatedEventId);
+            System.out.println(ds.getId()+"---------------"+ds.getS().toString()+" "+stimulatedEventId);
         }
-
+        System.out.println("finished!!");
         return dsList;
     }
 
