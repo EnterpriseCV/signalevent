@@ -1,6 +1,5 @@
 package nju.zxl.signalevent.controller;
 
-import nju.zxl.signalevent.bean.EventRuleBean;
 import nju.zxl.signalevent.service.DataEditService;
 import nju.zxl.signalevent.service.DataFetchService;
 import nju.zxl.signalevent.service.DataImportService;
@@ -24,21 +23,6 @@ public class DataController {
     @Autowired
     DataImportService dis;
 
-    @RequestMapping(value = "/fetch/eventrules",method = RequestMethod.GET)
-    public List<EventRuleBean> getEventRules(){
-        return dfs.getAllEventRule();
-    }
-
-    @RequestMapping(value="/fetch/eventrule/{id}",method = RequestMethod.GET)
-    public EventRuleBean getEventRule(@PathVariable int id){
-        return dfs.getEventRuleById(id);
-    }
-
-    @RequestMapping(value = "/edit/eventrule",method = RequestMethod.POST)
-    public boolean editEventRule(@RequestBody EventRuleBean erb){
-        return des.editEventRule(erb);
-    }
-
     @RequestMapping(value="/import/signal",method = RequestMethod.POST)
     public int importSignal(@RequestParam(value = "file") MultipartFile file){
         return dis.importSignal(file);
@@ -49,8 +33,8 @@ public class DataController {
         return dis.importEvent(file);
     }
 
-    @RequestMapping(value="/import/eventrule",method = RequestMethod.POST)
-    public int importEventRule(@RequestParam(value = "file")MultipartFile file){
-        return dis.importEventRule(file);
+    @RequestMapping(value="/import/andorrule",method = RequestMethod.POST)
+    public int importAndOrRule(@RequestParam(value = "file")MultipartFile file){
+        return dis.importAndOrRule(file);
     }
 }

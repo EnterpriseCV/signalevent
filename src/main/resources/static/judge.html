@@ -10,6 +10,17 @@
     <link rel="stylesheet" type="text/css" href="css/webuploader.css">
     <script src="js/webuploader.js"></script>
     <script src="js/vue.min.js"></script>
+    <style>
+        .table thead tr th{
+            vertical-align: middle;
+            text-align: center;
+        }
+        .table tbody tr td{
+            vertical-align: middle;
+            text-align: center;
+            border: solid;
+        }
+    </style>
 </head>
 <body>
 <div id="uploader" class="wu-example">
@@ -24,22 +35,19 @@
         <table class="table">
             <thead>
             <tr>
-                <th>事件编号</th>
-                <th>变电站名称</th>
-                <th>时间</th>
-                <th>信号</th>
+                <th>触发信号编号</th>
                 <th>预测事件编号</th>
-                <th>实际事件</th>
+                <th>预测事件权值</th>
+                <th>最终事件编号</th>
+                <th>实际事件编号</th>
             </tr>
             </thead>
             <tbody>
-            <tr v-for="event in events">
-                <td>{{event.id}}</td>
-                <td>{{event.ts_name}}</td>
-                <td>{{timeFormat(event.time)}}</td>
-                <td>{{event.s.jg_bh}},{{event.s.sb_bh}},{{event.s.info_bh}},{{event.s.act_bh}}</td>
-                <td>{{event.simulatedEventId}}</td>
-                <td>{{event.actualEvent}}</td>
+
+            <tr v-for="judgeResultBean in judgeResultBeans">
+                <td>{{judgeResultBean.trigger_signal}}</td>
+                <td>{{judgeResultBean.final_event_id}}</td>
+                <td>{{judgeResultBean.actual_event_id}}</td>
             </tr>
             </tbody>
         </table>
@@ -52,7 +60,7 @@
         var vue = new Vue({
             el:'#eventList',
             data:{
-                events:""
+                judgeResultBeans:""
             },
             methods:{
                 timeFormat:function(t){
@@ -120,7 +128,7 @@
         uploader.on( 'uploadSuccess', function( file,response ) {
             $( '#'+file.id ).find('p.state').text('已分析');
             console.log(response);
-            vue.events=response;
+            vue.judgeResultBeans=response;
         });
 
         uploader.on( 'uploadError', function( file ) {

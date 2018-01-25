@@ -1,36 +1,48 @@
-package nju.zxl.signalevent.domain;
+package nju.zxl.signalevent.eo;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+public class HistoryData {
+    int id;
+    String transf;
+    String bay;
+    String occur_time;
+    String content;
+    String signal_type;
+    String event_type;
+    String prov_bay;
+    String bay_id;
+    String prov_device;
+    String device_id;
+    String prov_template;
+    String template_id;
+    String action_attr;
+    String action_attr_id;
+    String signal_fid;
+    int handle_tag;
+    int batch_id;
+    int sourceid;
 
-@Entity
-@Table(name="history")
-public class History {
-    @Id
-    private int id;
-    private String transf;
-    private String bay;
-    private String occur_time;
-    private String content;
-    private String signal_type;
-    private String event_type;
-    private String prov_bay;
-    private String bay_id;
-    private String prov_device;
-    private String device_id;
-    private String prov_template;
-    private String template_id;
-    private String action_attr;
-    private String action_attr_id;
-    private String signal_fid;
-
-    public String getTemplate_id() {
-        return template_id;
+    public int getSourceid() {
+        return sourceid;
     }
 
-    public void setTemplate_id(String template_id) {
-        this.template_id = template_id;
+    public void setSourceid(int sourceid) {
+        this.sourceid = sourceid;
+    }
+
+    public int getHandle_tag() {
+        return handle_tag;
+    }
+
+    public void setHandle_tag(int handle_tag) {
+        this.handle_tag = handle_tag;
+    }
+
+    public int getBatch_id() {
+        return batch_id;
+    }
+
+    public void setBatch_id(int batch_id) {
+        this.batch_id = batch_id;
     }
 
     public int getId() {
@@ -127,6 +139,14 @@ public class History {
 
     public void setProv_template(String prov_template) {
         this.prov_template = prov_template;
+    }
+
+    public String getTemplate_id() {
+        return template_id;
+    }
+
+    public void setTemplate_id(String template_id) {
+        this.template_id = template_id;
     }
 
     public String getAction_attr() {
