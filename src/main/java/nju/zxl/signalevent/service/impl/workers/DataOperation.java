@@ -78,7 +78,7 @@ public class DataOperation {
 	
 	public int getEventamount() {
 		String sql = "select count(distinct eid) from `or_rule`";
-		int res = Integer.parseInt(String.valueOf(daoUtils.getForValue(sql)));
+		int res = Integer.parseInt(daoUtils.getForValue(sql).toString());
 		//System.out.println(res);	
 		return res;
 	}
@@ -123,6 +123,10 @@ public class DataOperation {
 			index++;
 		}
         return res;
+	}
+
+	public boolean saveList(List list){
+		return daoUtils.insertList(list);
 	}
 
 }

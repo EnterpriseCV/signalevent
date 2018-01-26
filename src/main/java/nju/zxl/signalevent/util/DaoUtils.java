@@ -244,5 +244,56 @@ public class DaoUtils {
         return null;
     }
 
+    public boolean insertList(List list){
+        if(list.size()<1){
+            return false;
+        }
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        StringBuilder sql = new StringBuilder();
+
+        try {
+            connection = DbUtils.getConnection();
+            connection.setAutoCommit(false);
+            Class clazz = list.get(0).getClass();
+            String tablename = clazz.getSimpleName();
+            sql.append("insert into `"+tablename+"`");
+
+            Field[] fls = clazz.getDeclaredFields();
+            sql.append("(");
+            for (int i = 0; i < fls.length; i++) {
+                if(i>0){
+                    sql.append(",");
+                }
+                sql.append(fls[i].getName());
+            }
+            sql.append(") values(");
+            for (int i = 0; i < fls.length; i++) {
+                if(i>0){
+                    sql.append(",");
+                }
+                sql.append("?");
+            }
+            sql.append(")");
+            preparedStatement = connection.prepareStatement(sql.toString());
+            for(Object o:list){
+                for(int i=0;i<fls.length;i++){
+                    fls[i].setAccessible(true);
+                    preparedStatement.setObject(i+1,fls[i].get(o));
+                }
+                preparedStatement.addBatch();
+            }
+            preparedStatement.executeBatch();
+            connection.commit();
+            connection.setAutoCommit(true);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            DbUtils.releaseDB(null, preparedStatement, connection);
+        }
+    }
+
 }
 

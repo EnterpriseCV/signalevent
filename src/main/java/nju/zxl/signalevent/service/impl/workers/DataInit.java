@@ -6,10 +6,7 @@ import java.util.List;
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
-import nju.zxl.signalevent.eo.AndRule;
-import nju.zxl.signalevent.eo.HistoryData;
-import nju.zxl.signalevent.eo.OrRule;
-import nju.zxl.signalevent.eo.TriggerSet;
+import nju.zxl.signalevent.eo.*;
 import org.springframework.web.multipart.MultipartFile;
 
 public class DataInit {
@@ -18,7 +15,7 @@ public class DataInit {
 		operation = new DataOperation();
 	}
 
-	public List<HistoryData> getSignalsfromData(MultipartFile file){
+	public List<HistoryData> getHistoryDataFromFile(MultipartFile file){
 		
 		List<HistoryData> hdlist = new ArrayList<HistoryData>();	
 		Sheet sheet;
@@ -95,4 +92,37 @@ public class DataInit {
 			
 		}
 
+	public List getSignalsFromFile(MultipartFile file){
+
+		ArrayList<Signal> slist = new ArrayList<Signal>();
+
+		Sheet sheet;
+		Workbook book;
+		Cell cell1,cell2,cell3,cell4,cell5;
+		try {
+			book = Workbook.getWorkbook(file.getInputStream());
+			sheet = book.getSheet(0);
+			for(int i=1;i<sheet.getRows();i++){
+				cell1 = sheet.getCell(1,i);
+				cell2 = sheet.getCell(2,i);
+				cell3 = sheet.getCell(3,i);
+				cell4 = sheet.getCell(4,i);
+				cell5 = sheet.getCell(0,i);
+				Signal s = new Signal();
+				s.setSid(Integer.valueOf(cell5.getContents()));
+				s.setArea_id(Integer.valueOf(cell1.getContents()));
+				s.setEquip_id(Integer.valueOf(cell2.getContents()));
+				s.setInfo_id(Integer.valueOf(cell3.getContents()));
+				s.setAct_id(Integer.valueOf(cell4.getContents()));
+				slist.add(s);
+			}
+			book.close();
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+
+		return slist;
+	}
+	
 }

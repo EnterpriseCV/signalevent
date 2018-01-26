@@ -21,7 +21,7 @@ public class EventDeterminer {
 	}
 	
 	public List<JudgeResult> judgeEvent(MultipartFile file){
-		List<HistoryData> hdlist = datainit.getSignalsfromData(file);
+		List<HistoryData> hdlist = datainit.getHistoryDataFromFile(file);
 		List<JudgeResult> finaljrlist = new ArrayList<JudgeResult>();
 		int index=0;
 		for(int i=0;i<hdlist.size();i++){

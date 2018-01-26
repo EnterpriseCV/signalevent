@@ -26,9 +26,12 @@ public class DataController {
 
     @RequestMapping(value="/import/signal",method = RequestMethod.POST)
     public int importSignal(@RequestParam(value = "file") MultipartFile file){
-        return dis.importSignal(file);
-    }
+        int importResult = -1;
+        importResult=dis.importSignal(file);
 
+        return importResult;
+    }
+/*
     @RequestMapping(value="/import/event",method = RequestMethod.POST)
     public int importEvent(@RequestParam(value = "file") MultipartFile file){
         return dis.importEvent(file);
@@ -38,7 +41,13 @@ public class DataController {
     public int importAndOrRule(@RequestParam(value = "file")MultipartFile file){
         return dis.importAndOrRule(file);
     }
+*/
 
+
+    @RequestMapping(value="/import/historydata",method = RequestMethod.POST)
+    public int importHistroyData(@RequestParam(value = "file")MultipartFile file){
+        return dis.importHistoryData(file);
+    }
     @RequestMapping(value="/edit/orrule",method = RequestMethod.POST)
     public int editOrRule(@RequestParam(value = "orid")int orid,@RequestParam(value = "signal_value")String signal_value) {
         if(des.editOrRuleValue(orid,signal_value)){
@@ -55,5 +64,12 @@ public class DataController {
     @RequestMapping(value = "/fetch/orrule",method = RequestMethod.GET)
     public OrRule getOrRule(@RequestParam(value = "orid")int orid){
         return dfs.getOrRuleByOrid(orid);
+    }
+    @RequestMapping(value="/rule/optimize",method = RequestMethod.POST)
+    public List<OrRule> ruleOptimize(@RequestParam("file") MultipartFile file){
+
+        //todo
+
+        return null;
     }
 }

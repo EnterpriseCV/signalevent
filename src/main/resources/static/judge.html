@@ -10,6 +10,7 @@
     <link rel="stylesheet" type="text/css" href="css/webuploader.css">
     <script src="js/webuploader.js"></script>
     <script src="js/vue.min.js"></script>
+    <!--
     <style>
         .table thead tr th{
             vertical-align: middle;
@@ -21,6 +22,7 @@
             border: solid;
         }
     </style>
+    -->
 </head>
 <body>
 <div id="uploader" class="wu-example">
@@ -31,23 +33,32 @@
         <button id="ctlBtn" class="btn btn-default">开始分析</button>
     </div>
 
-    <div id="eventList">
+    <div id="judgeResultList">
         <table class="table">
             <thead>
             <tr>
+                <th>触发信号源文件中序号</th>
                 <th>触发信号编号</th>
-                <th>预测事件编号</th>
-                <th>预测事件权值</th>
-                <th>最终事件编号</th>
-                <th>实际事件编号</th>
+                <th>该事件相关信号编号集合</th>
+                <th>可能事件编号</th>
+                <th>可能事件权值</th>
+                <th>最终预测事件编号</th>
+                <th>最终预测事件权值</th>
+                <th>实际事件</th>
+
             </tr>
             </thead>
             <tbody>
 
-            <tr v-for="judgeResultBean in judgeResultBeans">
-                <td>{{judgeResultBean.trigger_signal}}</td>
-                <td>{{judgeResultBean.final_event_id}}</td>
-                <td>{{judgeResultBean.actual_event_id}}</td>
+            <tr v-for="judgeResult in judgeResults">
+                <td>{{judgeResult.trigger_signal_source_id}}</td>
+                <td>{{judgeResult.trigger_signal_id}}</td>
+                <td>{{judgeResult.related_signals}}</td>
+                <td>{{judgeResult.possible_event_id}}</td>
+                <td>{{judgeResult.possible_event_value}}</td>
+                <td>{{judgeResult.final_event_id}}</td>
+                <td>{{judgeResult.final_event_value}}</td>
+                <td>{{judgeResult.actual_event_info}}</td>
             </tr>
             </tbody>
         </table>
@@ -58,9 +69,9 @@
 <script>
     $(document).ready(function(){
         var vue = new Vue({
-            el:'#eventList',
+            el:'#judgeResultList',
             data:{
-                judgeResultBeans:""
+                judgeResults:""
             },
             methods:{
                 timeFormat:function(t){
@@ -128,7 +139,7 @@
         uploader.on( 'uploadSuccess', function( file,response ) {
             $( '#'+file.id ).find('p.state').text('已分析');
             console.log(response);
-            vue.judgeResultBeans=response;
+            vue.judgeResults=response;
         });
 
         uploader.on( 'uploadError', function( file ) {

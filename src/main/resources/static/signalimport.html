@@ -69,8 +69,8 @@
             $percent.css( 'width', percentage * 100 + '%' );
         });
         uploader.on( 'uploadSuccess', function( file,response ) {
-            $( '#'+file.id ).find('p.state').text('已上传');
-            console.log(response);
+            $( '#'+file.id ).find('p.state').text(response==114514?'已上传':'上传出错，请检查数据格式是否正确，或数据库中已有相应信号数据！');
+            console.log(JSON.stringify(response));
         });
         uploader.on( 'uploadError', function( file ) {
             $( '#'+file.id ).find('p.state').text('上传出错');

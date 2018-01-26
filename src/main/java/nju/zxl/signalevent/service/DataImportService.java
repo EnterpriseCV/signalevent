@@ -6,4 +6,5 @@ public interface DataImportService {
     public int importSignal(MultipartFile f);
     public int importEvent(MultipartFile f);
     public int importAndOrRule(MultipartFile f);
+    public int importHistoryData(MultipartFile f);
 }
