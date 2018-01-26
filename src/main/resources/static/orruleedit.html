@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>事件规则权值编辑</title>
+
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+    <script src="js/bootstrap.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/webuploader.css">
+    <script src="js/webuploader.js"></script>
+    <script src="js/vue.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/footable.bootstrap.css">
+    <script src="js/footable.js"></script>
+
+    <style type="text/css">
+        .eventruleinfo td{
+            width: 50px;
+        }
+
+    </style>
+
+</head>
+<body>
+    <div id="orrulelist">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>或规则编号</th>
+                <th>与规则编号</th>
+                <th>事件编号</th>
+                <th>信号编号</th>
+                <th>信号类型</th>
+                <th>顺序</th>
+                <th>信号权值</th>
+                <th></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for = "orrule in orrules">
+                <td>{{orrule.orid}}</td>
+                <td>{{orrule.arid}}</td>
+                <td>{{orrule.eid}}</td>
+                <td>{{orrule.sid}}</td>
+                <td>{{orrule.signal_type}}</td>
+                <td>{{orrule.order}}</td>
+                <td><input :id="orrule.orid+'_signal_value'" type="text" v-model="orrule.signal_value" onchange="this.style='color:red'"/></td>
+                <td><button v-on:click="save(orrule)">保存</button></td>
+                <td><button v-on:click="reset(orrule)">重置</button></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+<script>
+    var vue;
+    $(document).ready(function(){
+        vue = new Vue({
+            el:'#orrulelist',
+            data:{
+                orrules:""
+            },
+            methods:{
+                save:function(orrule){
+                    //alert("保存"+orrule.orid+" "+orrule.signal_value);
+                    var id = orrule.orid+"_signal_value";
+                    $.ajax({
+                        url:"/data/edit/orrule",
+                        method:"post",
+                        data:{
+                            orid:orrule.orid,
+                            signal_value:orrule.signal_value
+                        },
+                        success:function(data){
+                            if(data=="1"){
+                                alert("修改成功!");
+                            }else{
+                                alert("修改失败!");
+                            }
+                            reset(orrule);
+                        }
+                    });
+                    $('#'+id).css("color","");
+                },
+                reset:function(orrule){
+                    //alert("重置"+orrule.orid+" "+orrule.signal_value);
+                    $.ajax({
+                        url:"/data/fetch/orrule",
+                        method:"get",
+                        data:{
+                            orid:orrule.orid,
+                        },
+                        success:function(data){
+                            orrule.signal_value=data.signal_value;
+                            var id = orrule.orid+"_signal_value";
+                            $('#'+id).css("color","");
+                        }
+                    });
+                }
+            }
+        });
+
+        $.ajax({
+            url:"/data/fetch/orrules",
+            method:"get",
+            success:function(data){
+                console.log(data);
+                vue.orrules=data;
+            }
+        });
+    });
+</script>
+</html>

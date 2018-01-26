@@ -1,6 +1,5 @@
 package nju.zxl.signalevent.controller;
 
-import nju.zxl.signalevent.bean.JudgeResultBean;
 import nju.zxl.signalevent.eo.JudgeResult;
 import nju.zxl.signalevent.service.JudgeEventService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,7 @@ public class JudgeEventController {
     @Autowired
     JudgeEventService jes;
     @RequestMapping(value="/",method = RequestMethod.POST)
-    public List<JudgeResultBean> judgeEvent(@RequestParam("file") MultipartFile file){
+    public List<JudgeResult> judgeEvent(@RequestParam("file") MultipartFile file){
         return jes.judgeEvent(file);
     }
 

@@ -215,6 +215,34 @@ public class DaoUtils {
 
         return null;
     }
+    public <E> List<E> getListForValue(String sql, Object... args) {
+
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        List<E> list = new ArrayList<E>();
+        try {
+            connection = DbUtils.getConnection();
+            preparedStatement = connection.prepareStatement(sql);
+
+            for (int i = 0; i < args.length; i++) {
+                preparedStatement.setObject(i + 1, args[i]);
+            }
+
+            resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                list.add((E)resultSet.getObject(1));
+            }
+            return list;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            DbUtils.releaseDB(resultSet, preparedStatement, connection);
+        }
+
+        return null;
+    }
 
 }
 

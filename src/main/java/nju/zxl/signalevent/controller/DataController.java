@@ -1,5 +1,6 @@
 package nju.zxl.signalevent.controller;
 
+import nju.zxl.signalevent.eo.OrRule;
 import nju.zxl.signalevent.service.DataEditService;
 import nju.zxl.signalevent.service.DataFetchService;
 import nju.zxl.signalevent.service.DataImportService;
@@ -36,5 +37,23 @@ public class DataController {
     @RequestMapping(value="/import/andorrule",method = RequestMethod.POST)
     public int importAndOrRule(@RequestParam(value = "file")MultipartFile file){
         return dis.importAndOrRule(file);
+    }
+
+    @RequestMapping(value="/edit/orrule",method = RequestMethod.POST)
+    public int editOrRule(@RequestParam(value = "orid")int orid,@RequestParam(value = "signal_value")String signal_value) {
+        if(des.editOrRuleValue(orid,signal_value)){
+            return 1;
+        }
+        return 0;
+    }
+
+    @RequestMapping(value = "/fetch/orrules",method = RequestMethod.GET)
+    public List<OrRule> getOrRules(){
+        return dfs.getAllOrRules();
+    }
+
+    @RequestMapping(value = "/fetch/orrule",method = RequestMethod.GET)
+    public OrRule getOrRule(@RequestParam(value = "orid")int orid){
+        return dfs.getOrRuleByOrid(orid);
     }
 }

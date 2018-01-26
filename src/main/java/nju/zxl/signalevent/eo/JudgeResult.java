@@ -20,12 +20,7 @@ public class JudgeResult {
 	public void setTrigger_signal_id(int trigger_signal_id) {
 		this.trigger_signal_id = trigger_signal_id;
 	}
-	public String getBatch_id() {
-		return batch_id;
-	}
-	public void setBatch_id(String batch_id) {
-		this.batch_id = batch_id;
-	}
+	
 	public int getPossible_event_id() {
 		return possible_event_id;
 	}
@@ -56,12 +51,39 @@ public class JudgeResult {
 	public void setActual_event_id(int actual_event_id) {
 		this.actual_event_id = actual_event_id;
 	}
+	int trigger_signal_source_id;
 	int trigger_signal_id;
-	String batch_id;
+	int batch_id;
+	String related_signals;
+	public int getTrigger_signal_source_id() {
+		return trigger_signal_source_id;
+	}
+	public void setTrigger_signal_source_id(int trigger_signal_source_id) {
+		this.trigger_signal_source_id = trigger_signal_source_id;
+	}
+	public String getRelated_signals() {
+		return related_signals;
+	}
+	public void setRelated_signals(String related_signals) {
+		this.related_signals = related_signals;
+	}
+	public void setBatch_id(int batch_id) {
+		this.batch_id = batch_id;
+	}
 	int possible_event_id;
 	String possible_event_value;
 	int final_event_id;
 	String final_event_value;
 	int actual_event_id;
+	String actual_event_info;
+	public String getActual_event_info() {
+		return actual_event_info;
+	}
+	public void setActual_event_info(String actual_event_info) {
+		this.actual_event_info = actual_event_info;
+	}
+	public int getBatch_id() {
+		return batch_id;
+	}
 
 }

@@ -2,7 +2,16 @@ package nju.zxl.signalevent.eo;
 
 public class HistoryData {
     int id;
-    String transf;
+    int sourceid;
+    public int getSourceid() {
+		return sourceid;
+	}
+
+	public void setSourceid(int sourceid) {
+		this.sourceid = sourceid;
+	}
+
+	String transf;
     String bay;
     String occur_time;
     String content;
@@ -18,16 +27,7 @@ public class HistoryData {
     String action_attr_id;
     String signal_fid;
     int handle_tag;
-    int batch_id;
-    int sourceid;
-
-    public int getSourceid() {
-        return sourceid;
-    }
-
-    public void setSourceid(int sourceid) {
-        this.sourceid = sourceid;
-    }
+    int batch_id;//批次
 
     public int getHandle_tag() {
         return handle_tag;
