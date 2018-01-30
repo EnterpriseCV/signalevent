@@ -124,5 +124,49 @@ public class DataInit {
 
 		return slist;
 	}
-	
+
+	public List getEventsFromFile(MultipartFile file){
+		ArrayList<Event> elist = new ArrayList<Event>();
+		Sheet sheet;
+		Workbook book;
+		Cell cell1,cell2,cell3,cell4,cell5;
+		try {
+			book = Workbook.getWorkbook(file.getInputStream());
+			sheet = book.getSheet(0);
+			for(int i=1;i<sheet.getRows();i++){
+				cell1 = sheet.getCell(1,i);
+				cell2 = sheet.getCell(2,i);
+				cell3 = sheet.getCell(3,i);
+				cell4 = sheet.getCell(4,i);
+				cell5 = sheet.getCell(0,i);
+				Event e = new Event();
+				e.setEid(Integer.valueOf(cell5.getContents()));
+				e.setArea_id(Integer.valueOf(cell1.getContents()));
+				e.setVoltage_id(Integer.valueOf(cell2.getContents()));
+				e.setEquipment_id(Integer.valueOf(cell3.getContents()));
+				e.setInfo_id(Integer.valueOf(cell4.getContents()));
+				e.setType_id(-1);
+				e.setRank_id(-1);
+				elist.add(e);
+			}
+			book.close();
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+
+		return elist;
+	}
+
+	public List getAndOrRuleFromFile(MultipartFile f){
+		List resultList = new ArrayList<>();
+		List andRuleList = new ArrayList<>();
+		List orRuleList = new ArrayList<>();
+
+
+		return resultList;
+	}
+
+
+
 }

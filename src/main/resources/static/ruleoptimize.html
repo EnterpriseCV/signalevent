@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>规则学习</title>
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+    <script src="js/bootstrap.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/webuploader.css">
+    <script src="js/webuploader.js"></script>
+    <script src="js/vue.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/footable.bootstrap.css">
+    <script src="js/footable.js"></script>
+</head>
+<body>
+<div id="thelist" class="uploader-list"></div>
+<div class="btns">
+    <div id="picker">选择历史表</div>
+    <button id="ctlBtn" class="btn btn-default">开始上传</button>
+</div>
+<div id="orrulelist">
+    <table class="table">
+        <thead>
+        <tr>
+            <th>或规则编号</th>
+            <th>与规则编号</th>
+            <th>事件编号</th>
+            <th>信号编号</th>
+            <th>信号类型</th>
+            <th>顺序</th>
+            <th>信号权值</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for = "orrule in orrules">
+            <td>{{orrule.orid}}</td>
+            <td>{{orrule.arid}}</td>
+            <td>{{orrule.eid}}</td>
+            <td>{{orrule.sid}}</td>
+            <td>{{orrule.signal_type}}</td>
+            <td>{{orrule.order}}</td>
+            <td>{{orrule.signal_value}}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+<script>
+    var vue;
+    $(document).ready(function(){
+        vue = new Vue({
+            el:'#orrulelist',
+            data:{
+                orrules:""
+            }
+        });
+
+        var state = 'pending';
+        var uploader = WebUploader.create({
+
+            // swf文件路径
+            swf: 'js/Uploader.swf',
+
+            // 文件接收服务端。
+            server: '/data/rule/optimize',
+            timeout: 0,
+
+            // 选择文件的按钮。可选。
+            // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+            pick: {
+                id:'#picker',
+                multiple:false
+            },
+            // 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！
+            resize: false,
+        });
+        uploader.on( 'fileQueued', function( file ) {
+            $('#thelist').append( '<div id="' + file.id + '" class="item">' +
+                '<h4 class="info">' + file.name + '</h4>' +
+                '<p class="state">等待上传...</p>' +
+                '</div>' );
+
+            for (var i = 0; i < uploader.getFiles().length-1; i++) {
+                uploader.removeFile(uploader.getFiles()[i]);
+                var $li = $('#' + uploader.getFiles()[i].id);
+                $li.off().remove();
+            }
+        });
+        uploader.on( 'uploadProgress', function( file, percentage ) {
+            var $li = $( '#'+file.id ),
+                $percent = $li.find('.progress .progress-bar');
+            // 避免重复创建
+            if ( !$percent.length ) {
+                $percent = $('<div class="progress progress-striped active">' +
+                    '<div class="progress-bar" role="progressbar" style="width: 0%">' +
+                    '</div>' +
+                    '</div>').appendTo( $li ).find('.progress-bar');
+            }
+            $li.find('p.state').text('上传中');
+
+            $percent.css( 'width', percentage * 100 + '%' );
+        });
+        uploader.on( 'uploadSuccess', function( file,response ) {
+            vue.orrules=response;
+            console.log(JSON.stringify(response));
+        });
+        uploader.on( 'uploadError', function( file ) {
+            $( '#'+file.id ).find('p.state').text('上传出错');
+        });
+        uploader.on( 'uploadComplete', function( file ) {
+            $( '#'+file.id ).find('.progress').fadeOut();
+            for (var i = 0; i < uploader.getFiles().length-1; i++) {
+                // 将图片从上传序列移除
+                uploader.removeFile(uploader.getFiles()[i]);
+                //uploader.removeFile(uploader.getFiles()[i], true);
+                //delete uploader.getFiles()[i];
+                // 将图片从缩略图容器移除
+                var $li = $('#' + uploader.getFiles()[i].id);
+                $li.off().remove();
+            }
+        });
+        $("#ctlBtn").on( 'click', function() {
+            if ( state === 'uploading' ) {
+                uploader.stop();
+            } else {
+                uploader.upload();
+            }
+        });
+    });
+</script>
+</html>

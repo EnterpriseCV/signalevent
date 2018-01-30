@@ -4,6 +4,7 @@ import nju.zxl.signalevent.eo.OrRule;
 import nju.zxl.signalevent.service.DataEditService;
 import nju.zxl.signalevent.service.DataFetchService;
 import nju.zxl.signalevent.service.DataImportService;
+import nju.zxl.signalevent.service.RuleOptimizeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +25,9 @@ public class DataController {
     @Autowired
     DataImportService dis;
 
+    @Autowired
+    RuleOptimizeService ros;
+
     @RequestMapping(value="/import/signal",method = RequestMethod.POST)
     public int importSignal(@RequestParam(value = "file") MultipartFile file){
         int importResult = -1;
@@ -31,7 +35,7 @@ public class DataController {
 
         return importResult;
     }
-/*
+
     @RequestMapping(value="/import/event",method = RequestMethod.POST)
     public int importEvent(@RequestParam(value = "file") MultipartFile file){
         return dis.importEvent(file);
@@ -41,8 +45,6 @@ public class DataController {
     public int importAndOrRule(@RequestParam(value = "file")MultipartFile file){
         return dis.importAndOrRule(file);
     }
-*/
-
 
     @RequestMapping(value="/import/historydata",method = RequestMethod.POST)
     public int importHistroyData(@RequestParam(value = "file")MultipartFile file){
@@ -69,7 +71,7 @@ public class DataController {
     public List<OrRule> ruleOptimize(@RequestParam("file") MultipartFile file){
 
         //todo
-
-        return null;
+        System.out.println(file.getOriginalFilename());
+        return ros.ruleOptimize();
     }
 }

@@ -188,6 +188,7 @@ public class RuleOptimizer {
      */
     public List correctRule() {
         Map<Event, List<HistoryData>> map = buildEvent(getUnhandleFaultData());
+        List resultList = new ArrayList<>();
 
         for (Map.Entry<Event, List<HistoryData>> entry :
                 map.entrySet()) {
@@ -211,6 +212,8 @@ public class RuleOptimizer {
                     }
                     if (!isContains) {
                         createNewRule(event.getEid(), sid, 4);
+                        OrRule orRule = daoUtils.get(OrRule.class,"select * from `or_rule` where orid = (select max(orid) from `or_rule`)");
+                        resultList.add(orRule);
                     }
                 }
                 System.out.println(sid);
@@ -218,7 +221,7 @@ public class RuleOptimizer {
 
         }
 
-        return null;
+        return resultList;
     }
 
     /**

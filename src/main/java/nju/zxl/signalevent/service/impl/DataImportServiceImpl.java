@@ -1,5 +1,6 @@
 package nju.zxl.signalevent.service.impl;
 
+import nju.zxl.signalevent.eo.Event;
 import nju.zxl.signalevent.eo.HistoryData;
 import nju.zxl.signalevent.eo.Signal;
 import nju.zxl.signalevent.service.DataImportService;
@@ -29,7 +30,15 @@ public class DataImportServiceImpl implements DataImportService{
 
     @Override
     public int importEvent(MultipartFile f) {
-        return 0;
+        List<Event> list = new DataInit().getEventsFromFile(f);
+        boolean saveResult = false;
+        saveResult=new DataOperation().saveList(list);
+        System.out.println(saveResult);
+        if(saveResult) {
+            return 114514;
+        }else{
+            return 1;
+        }
     }
 
     @Override
