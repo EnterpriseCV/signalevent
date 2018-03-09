@@ -16,14 +16,14 @@ public class DataInit {
 	}
 
 	public List<HistoryData> getHistoryDataFromFile(MultipartFile file){
-		
-		List<HistoryData> hdlist = new ArrayList<HistoryData>();	
+
+		List<HistoryData> hdlist = new ArrayList<HistoryData>();
 		Sheet sheet;
 		Workbook book;
 		Cell cell1,cell2,cell3,cell4,cell5,cell6,cell7,cell8,cell9,cell10,cell11,cell12,cell13,cell14,cell15,cell16;
 		try {
 			book = Workbook.getWorkbook(file.getInputStream());
-			sheet = book.getSheet(0); 
+			sheet = book.getSheet(0);
 			int index = -1;
 			for(int i=1;i<sheet.getRows();i++){
 				cell1 = sheet.getCell(1,i);
@@ -63,17 +63,20 @@ public class DataInit {
 					hd.setAction_attr_id(cell14.getContents().trim());
 					hd.setSignal_fid(cell15.getContents().trim());
 					hd.setHandle_tag(0);
+					hd.setTrigger_tag(0);
 					hdlist.add(hd);
-				}		
+				}
 			}
-			
-			book.close(); 
+
+			book.close();
 		}
 		catch(Exception e) {
 			e.printStackTrace();
-		} 
-		return hdlist;	
+		}
+		return hdlist;
 	}
+
+
 
 	public void inittriggerset(){
 			List<AndRule> arlist = operation.getAndrulelist();

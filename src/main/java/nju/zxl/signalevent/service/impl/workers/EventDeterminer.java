@@ -31,9 +31,11 @@ public class EventDeterminer {
 			if(!ifmarked){
 				List<HistoryData> firsttargetSiganls = gethistorylistbyfirstselection(i, hdlist);
 				System.out.println("current signal is "+hd.getSourceid()+" first list'size is "+firsttargetSiganls.size());
-				boolean iftriggered = ifHistoryDataTriggered(hd.getSignal_fid(), firsttargetSiganls);
+				TriggerReturn tr = ifHistoryDataTriggered(hd.getSignal_fid(), firsttargetSiganls);
+				boolean iftriggered = tr.isIftriggered();
 				if(iftriggered){
 					System.out.println("index="+index);
+					hdlist = marktriggertag(hdlist,tr.getTriggersignalid());
 					List<HistoryData> targetSiganls = getTargetSignals(i,hdlist);
 					jrlist = getSimulatedevent(targetSiganls);
 					hdlist = markList(targetSiganls,hdlist);
@@ -43,40 +45,48 @@ public class EventDeterminer {
 					}
 				}
 			}
-			System.out.println("已完成"+i+"/"+hdlist.size());
 		}
 		int marked = 0;
 		for(int i=0;i<hdlist.size();i++){
-        			if(hdlist.get(i).getHandle_tag()==1){
-        				marked++;
-        				System.out.println("信号编号"+i+" 实际事件是:"+hdlist.get(i).getEvent_type());
-        			}
-        		}	
+			if(hdlist.get(i).getHandle_tag()==1){
+				marked++;
+				System.out.println("信号编号"+i+" 实际事件是:"+hdlist.get(i).getEvent_type());
+			}
+		}
 		System.out.println("未标记信号数:"+(hdlist.size()-marked));
 		//dataoutput.dataOutput(finaljrlist);
 		return finaljrlist;
 	}
-		
-	
+
+	private List<HistoryData> marktriggertag(List<HistoryData> hdlist,int[] triggersignalid) {
+		for(HistoryData hd:hdlist){
+			for(int i=0;i<triggersignalid.length;i++){
+				if(hd.getId()==triggersignalid[i])
+					hd.setTrigger_tag(1);
+			}
+		}
+		return hdlist;
+	}
+
 	private boolean ifHistoryDataMarked(HistoryData hd) {
 		if(hd.getHandle_tag()==1)
 			return true;
 		else
 			return false;
 	}
-	
+
 	public boolean ifHistoryDataProtected(String infostr) {
 		int sid = operation.getSidbySignalinfo(infostr);
 		boolean res = false;
 		List<OrRule> orlist = operation.getOrrulelist();
 		for(OrRule or:orlist){
 			if((or.getSignal_type()==2||or.getSignal_type()==4)&&(sid == or.getSid())){
-				res = true;	
-			}		
+				res = true;
+			}
 		}
 		return res;
 	}
-	
+
 	//*该方法已弃用*  按照orrule中的信号属性进行判断是否是触发信号
 	public boolean ifHistoryDataNecessary(String infostr) {
 		int sid = operation.getSidbySignalinfo(infostr);
@@ -84,12 +94,12 @@ public class EventDeterminer {
 		List<OrRule> orlist = operation.getOrrulelist();
 		for(OrRule or:orlist){
 			if((or.getSignal_type()==1||or.getSignal_type()==2)&&(sid == or.getSid())){
-				res = true;	
-			}		
-		}		
+				res = true;
+			}
+		}
 		return res;
 	}
-	
+
 	//*该方法已弃用*  按照trigger_signal中的信号进行判断是否是触发信号
 	public boolean ifHistoryDataNecessaryNew(String infostr) {
 		List<TriggerSignal> tslist= operation.getTriggerSiganls();
@@ -98,10 +108,10 @@ public class EventDeterminer {
 		for(TriggerSignal ts:tslist){
 			if(sid == ts.getSid())
 				res = true;
-		}	
+		}
 		return res;
 	}
-	
+
 	private List<HistoryData> getTargetSignals(int i, List<HistoryData> hdlist) {
 		List<HistoryData> res = new ArrayList<HistoryData>();
 		String transformer_name = hdlist.get(i).getTransf();
@@ -112,9 +122,10 @@ public class EventDeterminer {
 		boolean ifsignaltriggered = true;
 		int lastid = hdlist.size()-1;
 		int index = i+1;
-		while(ifsignaltriggered==true&&index<lastid-1){	
+		while(ifsignaltriggered==true&&index<lastid-1){
 			List<HistoryData> firstdhlist = gethistorylistbyfirstselection(index, hdlist);
-			if(ifHistoryDataTriggered(hdlist.get(index).getSignal_fid(), firstdhlist))
+			TriggerReturn tr = ifHistoryDataTriggered(hdlist.get(index).getSignal_fid(), firstdhlist);
+			if(tr.isIftriggered())
 				ifsignaltriggered = false;
 			Date time2 = stringToDate(hdlist.get(index).getOccur_time());
 			long l2 = time2.getTime();
@@ -127,7 +138,7 @@ public class EventDeterminer {
 				res.add(hdlist.get(index));
 			}
 			index++;
-				
+
 		}
 		System.out.println("targetsignal's size is"+res.size());
 		return res;
@@ -143,12 +154,12 @@ public class EventDeterminer {
 		}
 		return d;
 	}
-	
+
 	private List<HistoryData> markList(List<HistoryData> targetSiganls, List<HistoryData> hdlist) {
 		for(HistoryData hd:targetSiganls){
-			int id = hd.getId();			
+			int id = hd.getId();
 			hdlist.get(id).setHandle_tag(1);
-	//		hdlist.get(id).setSimulatedEvent(simulatedevent);
+			//		hdlist.get(id).setSimulatedEvent(simulatedevent);
 			boolean ifprotected = ifHistoryDataProtected(hdlist.get(id).getSignal_fid());
 			if(ifprotected){
 				for(int i=id+1;i<hdlist.size()-1;i++){
@@ -164,15 +175,15 @@ public class EventDeterminer {
 					int m1 = hdlist.get(i).getHandle_tag();
 					if(t1.equals(t2)&&(jg1.equals(jg2))&&(sb1.equals(sb2))&&(info1.equals(info2))&&(act1.equals("2"))&&(m1==0)){
 						hdlist.get(i).setHandle_tag(1);
-		//				hdlist.get(i).setSimulatedEvent(simulatedevent);
+						//				hdlist.get(i).setSimulatedEvent(simulatedevent);
 						break;
 					}
-				}		
-			}	
+				}
+			}
 		}
 		return hdlist;
 	}
-	
+
 	private List<JudgeResult> getSimulatedevent(List<HistoryData> targetSiganls) {
 		List<JudgeResult> jrlist = new ArrayList<JudgeResult>();
 		int eventamount = operation.getEventamount();
@@ -197,28 +208,28 @@ public class EventDeterminer {
 				infovalue = 0;
 				eid = currentEventid;
 			}
-			
+
 			for(int j=0;j<tsid.length;j++){
 				if(or.getSid()==tsid[j])
 					infovalue += Double.parseDouble(or.getSignal_value());
 			}
-					
+
 			if(infovalue > simulatevalue){
 				simulatevalue = infovalue;
 				simulateeventid = currentEventid;
-			}		
+			}
 		}
 		possiblevalues[index][0] = eid;
 		possiblevalues[index][1] = infovalue;
 		System.out.println("the event is "+simulateeventid);
 		System.out.println("the value is "+simulatevalue);
-		
+
 		String signals = "";
 		for(int i=0;i<targetSiganls.size();i++){
 			signals = signals+String.valueOf(targetSiganls.get(i).getId())+";";
 		}
 		signals = signals.substring(0, signals.length()-1);
-		
+
 		for(int i=0;i<possiblevalues.length;i++){
 			JudgeResult jr = new JudgeResult();
 			jr.setTrigger_signal_source_id(targetSiganls.get(0).getSourceid());
@@ -231,11 +242,11 @@ public class EventDeterminer {
 			jr.setActual_event_id(-1);
 			jr.setActual_event_info(targetSiganls.get(0).getEvent_type());
 			jrlist.add(jr);
-		}	
+		}
 		return jrlist;
 	}
-	
-	//此方法用于初步筛选某信号之后的目标信号集   筛选条件是：时间小于60s；同变电站；未被标记   
+
+	//此方法用于初步筛选某信号之后的目标信号集   筛选条件是：时间小于60s；同变电站；未被标记
 	public List<HistoryData> gethistorylistbyfirstselection(int i,List<HistoryData> hdlist){
 		List<HistoryData> res = new ArrayList<HistoryData>();
 		String transformer_name = hdlist.get(i).getTransf();
@@ -252,23 +263,28 @@ public class EventDeterminer {
 				res.add(hdlist.get(j));
 			}
 		}
-		
+
 		return res;
 	}
-	
+
 	//此方法用于判断信号是否是触发信号 此处的hdlist是已经筛选过的信号，筛选条件是：时间小于60s；同变电站；未被标记   然后在该方法中进行进一步筛选同间隔
-	public boolean ifHistoryDataTriggered(String infostr,List<HistoryData> hdlist){
+	public TriggerReturn ifHistoryDataTriggered(String infostr,List<HistoryData> hdlist){
+//*
+		TriggerReturn tr = new TriggerReturn();
+		tr.setIftriggered(false);
+//*
+
 		int sid = operation.getSidbySignalinfo(infostr);
 		List<TriggerSet> tslist = operation.getTriggerSet();
 		boolean ifsignalintriggerset = false;
-		boolean ifsiganlTriggered = false;
+//		boolean ifsiganlTriggered = false;
 		for(TriggerSet ts:tslist){
 			if(sid==ts.getSid()){
 				ifsignalintriggerset = true;
 				break;
 			}
 		}
-		
+
 		if(ifsignalintriggerset){
 			List<HistoryData> usefullist = new ArrayList<HistoryData>();
 			String area_id = hdlist.get(0).getBay_id();
@@ -276,34 +292,51 @@ public class EventDeterminer {
 				String list_bay = hd.getBay_id();
 				if(area_id.equals(list_bay)){
 					usefullist.add(hd);
-				}	
-			}	
-			System.out.println("usefullist's size is: "+usefullist.size());
-			
+				}
+			}
+//			System.out.println("usefullist's size is: "+usefullist.size());
+
 			int[] eidlist = operation.getTriggerEidlist();
 			for(int i=0;i<eidlist.length;i++){
 				List<TriggerSet> tslistforeid = operation.getTriggerSetbyEid(eidlist[i]);
-				if(historydatalistContainsTriggerset(usefullist, tslistforeid)){
-					ifsiganlTriggered = true;
-					System.out.println("the fact usefullist's size is: "+usefullist.size());
+				TriggerReturn newtr = historydatalistContainsTriggerset(usefullist, tslistforeid);
+				tr.setIftriggered(newtr.isIftriggered());
+				tr.setTriggersignalid(newtr.getTriggersignalid());
+				if(tr.isIftriggered()){
+					System.out.println("break out");
 					break;
 				}
 			}
 		}
-		return ifsiganlTriggered;
-		
+
+//		return ifsiganlTriggered;
+		return tr;
+
 	}
-	
-	
+
+
 	//判断一个筛选过的historydata中是否含有一整个triggerset序列
-	public boolean historydatalistContainsTriggerset(List<HistoryData> hdlist,List<TriggerSet> tslist){
-		boolean res = true;
+	public TriggerReturn historydatalistContainsTriggerset(List<HistoryData> hdlist,List<TriggerSet> tslist){
+		TriggerReturn tr = new TriggerReturn();
+		boolean ifcontain = true;
+		int[] triggersetid =new int[tslist.size()];
+
 		boolean[] ifhdlistcontainsts = new boolean[tslist.size()];
 		int index = 0;
+		int triggersetindex = 0;
+
+//		int order_index = 1;
 		for(TriggerSet ts:tslist){
+//			int currentOrder = ts.getOrder();
 			for(HistoryData hd:hdlist){
-				if(operation.getSidbySignalinfo(hd.getSignal_fid())==ts.getSid()){
+//				if(operation.getSidbySignalinfo(hd.getSignal_fid())==ts.getSid()&&order_index==currentOrder){
+				if(operation.getSidbySignalinfo(hd.getSignal_fid())==ts.getSid()&&hd.getTrigger_tag()==0){
 					ifhdlistcontainsts[index] = true;
+					hd.setTrigger_tag(1);
+					triggersetid[triggersetindex] = hd.getId();
+					triggersetindex++;
+
+//					order_index++;
 					break;
 				}
 			}
@@ -311,21 +344,25 @@ public class EventDeterminer {
 		}
 		for(int i=0;i<tslist.size();i++){
 			if(ifhdlistcontainsts[i]==false){
-				res = false;
+				ifcontain = false;
 				break;
 			}
 		}
-		return res;
-		
+		tr.setIftriggered(ifcontain);
+		tr.setTriggersignalid(triggersetid);
+
+		return tr;
+
 	}
-	
+
 	//该方法也未用过
 	public List<HistoryData> getTriggerSignals(List<HistoryData> hdlist){
 		List<HistoryData> res = new ArrayList<HistoryData>();
 		int index = 0;
 		for(HistoryData hd:hdlist){
 			List<HistoryData> firsthdlist = gethistorylistbyfirstselection(index, hdlist);
-			if(ifHistoryDataTriggered(hd.getSignal_fid(), firsthdlist)){
+			TriggerReturn tr = ifHistoryDataTriggered(hd.getSignal_fid(), firsthdlist);
+			if(tr.isIftriggered()){
 				res.add(hd);
 				System.out.println(hd.getSourceid()+hd.getTransf()+hd.getId());
 			}

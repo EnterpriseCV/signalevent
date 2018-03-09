@@ -28,6 +28,16 @@ public class HistoryData {
     String signal_fid;
     int handle_tag;
     int batch_id;//批次
+    int trigger_tag;//用于标记是否是触发信号，不用于目标信号集合中的第二次触发信号判断
+
+    public int getTrigger_tag() {
+        return trigger_tag;
+    }
+
+    public void setTrigger_tag(int trigger_tag) {
+        this.trigger_tag = trigger_tag;
+    }
+
 
     public int getHandle_tag() {
         return handle_tag;
