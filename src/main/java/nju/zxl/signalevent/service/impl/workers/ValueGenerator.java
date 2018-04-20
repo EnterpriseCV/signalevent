@@ -1,5 +1,6 @@
 package nju.zxl.signalevent.service.impl.workers;
 
+import nju.zxl.signalevent.eo.AndRule;
 import nju.zxl.signalevent.eo.OrRule;
 import nju.zxl.signalevent.util.DaoUtils;
 
@@ -58,9 +59,10 @@ public class ValueGenerator {
 	public void getValues(){
 		double coefficient = 0.8;
 		int amount = operation.getAndruleAmount();
-		for(int m=1;m<=amount;m++){
+		List<AndRule> arList = operation.getAndrulelist();
+		for(int m=0;m<amount;m++){
 			System.out.println("m="+m);
-			List<OrRule> orlistbyarid = operation.getOrrulelistbyArid(m);
+			List<OrRule> orlistbyarid = operation.getOrrulelistbyArid(arList.get(m).getArid());
 			System.out.println(orlistbyarid.size());
 			int ifNecessary = 0;
 			if(orlistbyarid.get(0).getSignal_type()==1||orlistbyarid.get(0).getSignal_type()==2)

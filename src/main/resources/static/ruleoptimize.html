@@ -103,6 +103,7 @@
         uploader.on( 'uploadSuccess', function( file,response ) {
             vue.orrules=response;
             console.log(JSON.stringify(response));
+            $( '#'+file.id ).find('p.state').text('学习完成');
         });
         uploader.on( 'uploadError', function( file ) {
             $( '#'+file.id ).find('p.state').text('上传出错');

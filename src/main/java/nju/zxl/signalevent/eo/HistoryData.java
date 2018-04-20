@@ -16,7 +16,7 @@ public class HistoryData {
     String occur_time;
     String content;
     String signal_type;
-    String event_type;
+    String event_detail;
     String prov_bay;
     String bay_id;
     String prov_device;
@@ -30,30 +30,13 @@ public class HistoryData {
     int batch_id;//批次
     int trigger_tag;//用于标记是否是触发信号，不用于目标信号集合中的第二次触发信号判断
 
-    public int getTrigger_tag() {
-        return trigger_tag;
-    }
-
-    public void setTrigger_tag(int trigger_tag) {
-        this.trigger_tag = trigger_tag;
-    }
-
-
-    public int getHandle_tag() {
-        return handle_tag;
-    }
-
-    public void setHandle_tag(int handle_tag) {
-        this.handle_tag = handle_tag;
-    }
-
-    public int getBatch_id() {
-        return batch_id;
-    }
-
-    public void setBatch_id(int batch_id) {
-        this.batch_id = batch_id;
-    }
+    String event_type;
+    String event_area;
+    String event_vol;
+    String event_equip;
+    String event_info;
+    String event_id;
+    String event_mark;
 
     public int getId() {
         return id;
@@ -103,12 +86,12 @@ public class HistoryData {
         this.signal_type = signal_type;
     }
 
-    public String getEvent_type() {
-        return event_type;
+    public String getEvent_detail() {
+        return event_detail;
     }
 
-    public void setEvent_type(String event_type) {
-        this.event_type = event_type;
+    public void setEvent_detail(String event_detail) {
+        this.event_detail = event_detail;
     }
 
     public String getProv_bay() {
@@ -181,5 +164,85 @@ public class HistoryData {
 
     public void setSignal_fid(String signal_fid) {
         this.signal_fid = signal_fid;
+    }
+
+    public int getHandle_tag() {
+        return handle_tag;
+    }
+
+    public void setHandle_tag(int handle_tag) {
+        this.handle_tag = handle_tag;
+    }
+
+    public int getBatch_id() {
+        return batch_id;
+    }
+
+    public void setBatch_id(int batch_id) {
+        this.batch_id = batch_id;
+    }
+
+    public int getTrigger_tag() {
+        return trigger_tag;
+    }
+
+    public void setTrigger_tag(int trigger_tag) {
+        this.trigger_tag = trigger_tag;
+    }
+
+    public String getEvent_type() {
+        return event_type;
+    }
+
+    public void setEvent_type(String event_type) {
+        this.event_type = event_type;
+    }
+
+    public String getEvent_area() {
+        return event_area;
+    }
+
+    public void setEvent_area(String event_area) {
+        this.event_area = event_area;
+    }
+
+    public String getEvent_vol() {
+        return event_vol;
+    }
+
+    public void setEvent_vol(String event_vol) {
+        this.event_vol = event_vol;
+    }
+
+    public String getEvent_equip() {
+        return event_equip;
+    }
+
+    public void setEvent_equip(String event_equip) {
+        this.event_equip = event_equip;
+    }
+
+    public String getEvent_info() {
+        return event_info;
+    }
+
+    public void setEvent_info(String event_info) {
+        this.event_info = event_info;
+    }
+
+    public String getEvent_id() {
+        return event_id;
+    }
+
+    public void setEvent_id(String event_id) {
+        this.event_id = event_id;
+    }
+
+    public String getEvent_mark() {
+        return event_mark;
+    }
+
+    public void setEvent_mark(String event_mark) {
+        this.event_mark = event_mark;
     }
 }

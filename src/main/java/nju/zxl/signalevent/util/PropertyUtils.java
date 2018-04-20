@@ -21,8 +21,10 @@ public class PropertyUtils {
     static {
         try {
             propertie = new Properties();
-            File file = ResourceUtils.getFile("classpath:"+fileName);
-            propertie.load(new FileInputStream(file));
+            //File file = ResourceUtils.getFile("classpath:"+fileName);
+            //propertie.load(new FileInputStream(file));
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            propertie.load(loader.getResourceAsStream(fileName));
             dbDriver = propertie.getProperty("dbDriver");
             dbUrl = propertie.getProperty("dbUrl");
             dbUserName = propertie.getProperty("dbUserName");

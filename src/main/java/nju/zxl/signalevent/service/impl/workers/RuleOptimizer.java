@@ -7,7 +7,6 @@ import nju.zxl.signalevent.eo.HistoryData;
 import nju.zxl.signalevent.eo.OrRule;
 import nju.zxl.signalevent.util.DaoUtils;
 
-import java.math.BigInteger;
 import java.util.*;
 
 public class RuleOptimizer {
@@ -24,43 +23,50 @@ public class RuleOptimizer {
      */
     public List<HistoryData> getUnhandleFaultData() {
 
-        List<HistoryData> list = daoUtils.getForList(HistoryData.class, "select * from history_data where handle_tag=0 and event_type like '%故障%' order by id desc");
+        List<HistoryData> list = daoUtils.getForList(HistoryData.class, "select * from history_data where handle_tag=0 and event_detail like '%故障%' and signal_fid<>'' and event_mark<>'' order by id desc");
+        if (list==null || list.size()==0) return null;
         System.out.println(list.size());
+        //System.out.println(list.get(0).getEvent_type());
         return list;
     }
 
     /**
-     * 获得未处理过的异常类历史数据
+     * 获得未处理过的非故障类历史数据
      *
      * @return
      */
-    public List<HistoryData> getUnhandleExceptionData() {
+    public List<HistoryData> getUnhandleUnfaultData() {
 
-        List<HistoryData> list = daoUtils.getForList(HistoryData.class, "select * from history_data where handle_tag=0 and event_type like '%异常%' order by id desc");
+        List<HistoryData> list = daoUtils.getForList(HistoryData.class, "select * from history_data where handle_tag=0 and event_detail not like '%故障%' and signal_fid<>'' and event_mark<>'' order by id desc");
+        if (list==null || list.size()==0) return null;
         System.out.println(list.size());
         return list;
     }
 
     public Event getEvent(int eid) {
         List<Event> list = daoUtils.getForList(Event.class, "select * from event where eid=" + eid);
+        if (list==null || list.size()==0) return null;
         System.out.println(list.size());
         return list.get(0);
     }
 
-    public Event getEventByInfo(int area_id, int voltage_id, int equipment_id, int info_id) {
-        List<Event> list = daoUtils.getForList(Event.class, "select * from event where area_id=? and voltage_id=? and equipment_id=? and info_id=?", area_id, voltage_id, equipment_id, info_id);
+    public Event getEventByInfo(int area_id, int voltage_id, int equipment_id, int info_id,int type_id) {
+        List<Event> list = daoUtils.getForList(Event.class, "select * from event where area_id=? and voltage_id=? and equipment_id=? and info_id=? and type_id=?", area_id, voltage_id, equipment_id, info_id,type_id);
+        if (list==null || list.size()==0) return null;
         System.out.println(list.size());
         return list.get(0);
     }
 
     public List<AndRule> getAndRuleByEid(int eid) {
         List<AndRule> list = daoUtils.getForList(AndRule.class, "select * from and_rule where eid=" + eid);
+        if (list==null || list.size()==0) return null;
         System.out.println(list.size());
         return list;
     }
 
     public List<OrRule> getOrRuleByEid(int eid) {
         List<OrRule> list = daoUtils.getForList(OrRule.class, "select * from or_rule where eid=" + eid);
+        if (list==null || list.size()==0) return null;
         System.out.println(list.size());
         return list;
     }
@@ -69,7 +75,12 @@ public class RuleOptimizer {
         String sql = "SELECT sid FROM grid_event.`signal` where area_id=? and equip_id=? and info_id=? and act_id=?";
         int sid = -1;
         try {
-            sid = daoUtils.getForValue(sql, strings);
+            Integer integer = daoUtils.getForValue(sql, strings);
+            if (integer==null){
+                sid=-1;
+            }else {
+                sid=integer.intValue();
+            }
             System.out.println(sid);
             return sid;
         } catch (Exception e) {
@@ -91,17 +102,17 @@ public class RuleOptimizer {
         Map<Event, List<HistoryData>> map = new HashMap<>();
         List<HistoryData> tmpList = new ArrayList<HistoryData>();
 
-        String event_type = hdlist.get(0).getEvent_type();
+        String event_mark = hdlist.get(0).getEvent_mark();
         tmpList.add(hdlist.get(0));
         Event event = getEventFromHd(hdlist.get(0));
 
         for (int i = 1; i < hdlist.size(); i++) {
-            if (hdlist.get(i).getEvent_type().equals(event_type)) {
+            if (hdlist.get(i).getEvent_mark().equals(event_mark)) {
                 tmpList.add(hdlist.get(i));
                 continue;
             } else {
                 map.put(event, tmpList);
-                event_type = hdlist.get(i).getEvent_type();
+                event_mark = hdlist.get(i).getEvent_type();
                 event = getEventFromHd(hdlist.get(i));
                 tmpList = new ArrayList<HistoryData>();
                 tmpList.add(hdlist.get(i));
@@ -111,117 +122,99 @@ public class RuleOptimizer {
         return map;
     }
 
+    public int getIdByValue(String tableName,String attributeName,String attributeValue){
+        int id;
+        Integer integer = daoUtils.getForValue("SELECT active_id FROM grid_event.attribute_name where table_name=? and attribute_name=? and attribute_value=?",tableName,attributeName,attributeValue);
+        if (integer==null){
+            id=-1;
+        }else {
+            id=integer.intValue();
+        }
+        System.out.println(id);
+        return id;
+    }
+
     /**
      * 根据历史数据中的事件信息返回对应的事件
      * 如果是故障事件，根据事件信息找到对应的event对象
      * 如果是异常事件创建新的event对象，确定event各字段值并插入新event数据到event表
-     * 等待实现！！
+     *
      * @param historyData
      * @return Event
      */
     public Event getEventFromHd(HistoryData historyData) {
 
-        int interval = -1;
-        int equipment = -1, equipment1 = -1;
-        int voltage = -1;
-        int information = -1;
+        String eventType = historyData.getEvent_type();
+        String eventArea = historyData.getEvent_area();
+        String eventVol = historyData.getEvent_vol();
+        String eventEquip = historyData.getEvent_equip();
+        String eventInfo = historyData.getEvent_info();
 
+        int type_id = getIdByValue("event","type_id",eventType);
+        int area_id = getIdByValue("event","area_id",eventArea);
+        int voltage_id =getIdByValue("event","voltage_id",eventVol);
+        int equipment_id=getIdByValue("event","equipment_id",eventEquip);
+        int info_id=getIdByValue("event","info_id",eventInfo);
 
-        String actionattr = historyData.getAction_attr().trim();
-        if (actionattr.equals("合闸") || actionattr.equals("分闸")) {
-            interval = Integer.parseInt(historyData.getBay_id());
+        Event event = getEventByInfo(area_id, voltage_id, equipment_id, info_id,type_id);
+        if (event==null){
+            daoUtils.update("INSERT INTO `grid_event`.`event`\n" +
+                    "(\n" +
+                    "`area_id`,\n" +
+                    "`voltage_id`,\n" +
+                    "`equipment_id`,\n" +
+                    "`info_id`,\n" +
+                    "`type_id`,\n" +
+                    "`rank_id`)\n" +
+                    "VALUES\n" +
+                    "(?,?,?,?,?,-1)",area_id,voltage_id,equipment_id,info_id,type_id);
+            event = getEventByInfo(area_id, voltage_id, equipment_id, info_id,type_id);
         }
-
-        if (interval == 2) {
-            equipment = 2;
-            equipment1 = 3;
-        } else if (interval == 3) {
-            equipment = 4;
-            equipment1 = 5;
-        } else {
-            equipment = interval;
-            equipment1 = interval;
-        }
-
-
-        if ((interval >= 1 && interval <= 9) || (interval >= 34 && interval <= 35))
-            voltage = 1;
-        else if ((interval >= 25 && interval <= 33) || (interval >= 36 && interval <= 37))
-            voltage = 2;
-        else if ((interval >= 10 && interval <= 16) || (interval >= 38 && interval <= 39) || (interval == 24))
-            voltage = 3;
-
-        String event_type = historyData.getEvent_type().trim();
-        if (event_type.contains("永久性故障"))
-            information = 6;
-        else if (event_type.contains("瞬时性故障"))
-            information = 5;
-        else if (event_type.contains("相间故障"))
-            information = 4;
-        else if (event_type.contains("单相永久故障"))
-            information = 3;
-        else if (event_type.contains("单相瞬时故障"))
-            information = 2;
-        else if (event_type.contains("母线故障"))
-            information = 1;
-        else if (event_type.contains("主变电气量故障"))
-            information = 7;
-        else if (event_type.contains("本地故障"))
-            information = 8;
-        else if (event_type.contains("有载调压故障"))
-            information = 9;
-
-//        Event event = new Event();
-//        event.setEid(4);
-//        event.setArea_id(interval);
-//        event.setEquipment_id(equipment);
-//        event.setInfo_id(information);
-//        event.setVoltage_id(voltage);
-//        event.setType_id(type);
-//        event.setRank_id(rank);
-        Event event = getEventByInfo(interval, voltage, equipment, information);
         return event;
     }
 
     /**
      * 处理故障事件的规则
      */
-    public List correctRule() {
+    public List<Integer> dealFaultRule() {
+        List<Integer> newOrRuleIdList = new ArrayList<Integer>();
+
         Map<Event, List<HistoryData>> map = buildEvent(getUnhandleFaultData());
-        List resultList = new ArrayList<>();
 
         for (Map.Entry<Event, List<HistoryData>> entry :
                 map.entrySet()) {
             Event event = entry.getKey();
             List<HistoryData> historyDataList = entry.getValue();
-            List<Integer> sidList = new ArrayList<>();
+            //List<Integer> sidList = new ArrayList<>();
+            //List<AndRule> arlist = getAndRuleByEid(event.getEid());
 
-            List<AndRule> arlist = getAndRuleByEid(event.getEid());
             List<OrRule> orlist = getOrRuleByEid(event.getEid());
 
             for (int i = 0; i < historyDataList.size(); i++) {
                 String[] signalInfo = historyDataList.get(i).getSignal_fid().split(",");
                 int sid = getSidByFid(signalInfo);
                 if (sid != -1) {
-                    boolean isContains = false;
-                    for (int j = 0; j < orlist.size(); j++) {
-                        if (orlist.get(j).getSid() == sid) {
-                            isContains = true;
-                            break;
+                    if (orlist!=null) {
+                        boolean isContains = false;
+                        for (int j = 0; j < orlist.size(); j++) {
+                            if (orlist.get(j).getSid() == sid) {
+                                isContains = true;
+                                if(!newOrRuleIdList.contains(orlist.get(j).getOrid()))newOrRuleIdList.add(orlist.get(j).getOrid());
+                                break;
+                            }
                         }
-                    }
-                    if (!isContains) {
-                        createNewRule(event.getEid(), sid, 4);
-                        OrRule orRule = daoUtils.get(OrRule.class,"select * from `or_rule` where orid = (select max(orid) from `or_rule`)");
-                        resultList.add(orRule);
+                        if (!isContains) {
+                            newOrRuleIdList.add( createNewRule(event.getEid(), sid, 4));
+                        }
+                    }else {
+                        //如果故障类事件原先不存在，新建后or规则如何设置
                     }
                 }
                 System.out.println(sid);
             }
 
         }
-
-        return resultList;
+        return newOrRuleIdList;
     }
 
     /**
@@ -230,7 +223,7 @@ public class RuleOptimizer {
      * @param sid
      * @param signal_type
      */
-    public void createNewRule(int eid, int sid, int signal_type) {
+    public int createNewRule(int eid, int sid, int signal_type) {
         String orSql = "INSERT INTO `grid_event`.`or_rule`\n" +
                 "(\n" +
                 "`arid`,\n" +
@@ -255,26 +248,24 @@ public class RuleOptimizer {
 
         daoUtils.update(orSql, aid, eid, sid, signal_type);
         System.out.println("new or rule");
+        int orid = daoUtils.getForValue("select max(orid) from or_rule");
+        return orid;
     }
 
     /**
-     * 处理历史数据中未处理过的异常事件
+     * 处理历史数据中未处理过的非故障类事件
      * 并添加新异常事件规则
      */
-    public void dealExceptionRule() {
-        Map<Event, List<HistoryData>> map = buildEvent(getUnhandleExceptionData());
+    public List<Integer> dealUnfaultRule() {
+        List<Integer> newOrRuleIdList = new ArrayList<Integer>();
+
+        Map<Event, List<HistoryData>> map = buildEvent(getUnhandleUnfaultData());
 
         for (Map.Entry<Event, List<HistoryData>> entry :
                 map.entrySet()) {
             Event event = entry.getKey();
             List<HistoryData> historyDataList = entry.getValue();
             for (int i = 0; i < historyDataList.size(); i++) {
-
-                String[] signalInfo = historyDataList.get(i).getSignal_fid().split(",");
-                int sid = getSidByFid(signalInfo);
-                if (containsSidInOr(sid)) {
-                    continue;
-                }
 
                 int signal_type = -1;
                 //根据信号属性判断信号类型
@@ -284,9 +275,20 @@ public class RuleOptimizer {
                 } else {
                     signal_type = 2;
                 }
-                createNewRule(event.getEid(), sid, signal_type);
+
+                String[] signalInfo = historyDataList.get(i).getSignal_fid().split(",");
+                int sid = getSidByFid(signalInfo);
+                if (containsSidInOr(sid)) {
+                    int orid = getOrid(event.getEid(),sid,signal_type);
+                    if(orid!=-1&&!newOrRuleIdList.contains(orid)){
+                        newOrRuleIdList.add(orid);
+                    }
+                    continue;
+                }
+                newOrRuleIdList.add(createNewRule(event.getEid(), sid, signal_type));
             }
         }
+        return newOrRuleIdList;
     }
 
     /**
@@ -299,5 +301,11 @@ public class RuleOptimizer {
         String sql = "select count(*) from or_rule where sid=?";
         long count = daoUtils.getForValue(sql, sid);
         return count != 0;
+    }
+    public int getOrid(int eid,int sid,int signal_type){
+        String sql = "select * from or_rule where eid=? and sid=? and signal_type=?";
+        OrRule or = daoUtils.get(OrRule.class,sql,eid,sid,signal_type);
+        if(or!=null)return or.getOrid();
+        else return -1;
     }
 }

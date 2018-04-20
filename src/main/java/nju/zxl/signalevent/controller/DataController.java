@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @CrossOrigin
@@ -69,9 +70,18 @@ public class DataController {
     }
     @RequestMapping(value="/rule/optimize",method = RequestMethod.POST)
     public List<OrRule> ruleOptimize(@RequestParam("file") MultipartFile file){
-
+        List<OrRule> orList = new ArrayList<OrRule>();
         //todo
         System.out.println(file.getOriginalFilename());
-        return ros.ruleOptimize();
+        int importResult = -1;
+        importResult=dis.importHistoryData(file);
+        if(importResult!=114514)return orList;
+
+        List<Integer> oridList = new ArrayList<Integer>();
+        oridList.addAll(ros.ruleOptimize());
+        for(int orid:oridList){
+            orList.add(dfs.getOrRuleByOrid(orid));
+        }
+        return orList;
     }
 }

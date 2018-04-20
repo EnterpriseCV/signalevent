@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import nju.zxl.signalevent.eo.HistoryData;
 import nju.zxl.signalevent.eo.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,15 +47,38 @@ public class EventDeterminer {
 				}
 			}
 		}
+
+		//进行非故障类事件的判断
+		for(int i=0;i<hdlist.size();i++){
+			List<JudgeResult> jrlist = new ArrayList<JudgeResult>();
+			HistoryData hd = hdlist.get(i);
+			boolean ifmarked = ifHistoryDataMarked(hd);
+			if(!ifmarked){
+				List<HistoryData> firsttargetSiganls = gethistorylistbyfirstselection(i, hdlist);
+				System.out.println("current signal is "+hd.getSourceid()+" first list'size is "+firsttargetSiganls.size());
+
+				boolean iftriggered = ifHistoryDataTriggered_notFailure(hd.getSignal_fid(), firsttargetSiganls);
+				if(iftriggered){
+					System.out.println("index="+index);
+					List<HistoryData> targetSiganls = getTargetSignals(i,hdlist);
+					jrlist = getSimulatedevent(targetSiganls);
+					hdlist = markList(targetSiganls,hdlist);
+					index++;
+					for(JudgeResult jr:jrlist){
+						finaljrlist.add(jr);
+					}
+				}
+			}
+		}
+		//
 		int marked = 0;
 		for(int i=0;i<hdlist.size();i++){
 			if(hdlist.get(i).getHandle_tag()==1){
 				marked++;
-				System.out.println("信号编号"+i+" 实际事件是:"+hdlist.get(i).getEvent_type());
+				System.out.println("信号编号"+i+" 实际事件是:"+hdlist.get(i).getEvent_detail());
 			}
 		}
 		System.out.println("未标记信号数:"+(hdlist.size()-marked));
-		//dataoutput.dataOutput(finaljrlist);
 		return finaljrlist;
 	}
 
@@ -83,31 +107,6 @@ public class EventDeterminer {
 			if((or.getSignal_type()==2||or.getSignal_type()==4)&&(sid == or.getSid())){
 				res = true;
 			}
-		}
-		return res;
-	}
-
-	//*该方法已弃用*  按照orrule中的信号属性进行判断是否是触发信号
-	public boolean ifHistoryDataNecessary(String infostr) {
-		int sid = operation.getSidbySignalinfo(infostr);
-		boolean res = false;
-		List<OrRule> orlist = operation.getOrrulelist();
-		for(OrRule or:orlist){
-			if((or.getSignal_type()==1||or.getSignal_type()==2)&&(sid == or.getSid())){
-				res = true;
-			}
-		}
-		return res;
-	}
-
-	//*该方法已弃用*  按照trigger_signal中的信号进行判断是否是触发信号
-	public boolean ifHistoryDataNecessaryNew(String infostr) {
-		List<TriggerSignal> tslist= operation.getTriggerSiganls();
-		int sid = operation.getSidbySignalinfo(infostr);
-		boolean res = false;
-		for(TriggerSignal ts:tslist){
-			if(sid == ts.getSid())
-				res = true;
 		}
 		return res;
 	}
@@ -173,7 +172,7 @@ public class EventDeterminer {
 					String info2 = hd.getTemplate_id();
 					String act1 = hdlist.get(i).getAction_attr_id();
 					int m1 = hdlist.get(i).getHandle_tag();
-					if(t1.equals(t2)&&(jg1.equals(jg2))&&(sb1.equals(sb2))&&(info1.equals(info2))&&(act1.equals("2"))&&(m1==0)){
+					if(t1.equals(t2)&&(jg1.equals(jg2))&&(sb1.equals(sb2))&&(info1.equals(info2))&&((act1.equals("27"))||(act1.equals("29"))||(act1.equals("31")))&&(m1==0)){
 						hdlist.get(i).setHandle_tag(1);
 						//				hdlist.get(i).setSimulatedEvent(simulatedevent);
 						break;
@@ -240,7 +239,7 @@ public class EventDeterminer {
 			jr.setFinal_event_id(simulateeventid);
 			jr.setFinal_event_value(String.valueOf(simulatevalue));
 			jr.setActual_event_id(-1);
-			jr.setActual_event_info(targetSiganls.get(0).getEvent_type());
+			jr.setActual_event_info(targetSiganls.get(0).getEvent_detail());
 			jrlist.add(jr);
 		}
 		return jrlist;
@@ -315,6 +314,47 @@ public class EventDeterminer {
 	}
 
 
+	//此方法用于判断信号是否是触发信号（非故障类事件） 此处的hdlist是已经筛选过的信号，筛选条件是：时间小于60s；同变电站；未被标记   然后在该方法中进行进一步筛选同间隔
+	public boolean ifHistoryDataTriggered_notFailure(String infostr,List<HistoryData> hdlist){
+		//*
+		TriggerReturn tr = new TriggerReturn();
+		tr.setIftriggered(false);
+		//*
+		int sid = operation.getSidbySignalinfo(infostr);
+		List<Event> elist = operation.getEvent_notFailure();
+		List<OrRule> orlist = new ArrayList<OrRule>();
+		for(Event e:elist){
+			List<OrRule> list = operation.getOrrulelistbyEid(e.getEid());
+			for(OrRule or:list){
+				orlist.add(or);
+			}
+		}
+		List<TriggerSet> tslist = new ArrayList<TriggerSet>();
+		//此index用于标记orrule转triggerset中的id属性
+		int index = 0;
+		for(OrRule or:orlist){
+			TriggerSet ts = new TriggerSet();
+			ts.setEid(or.getEid());
+			ts.setId(index);
+			ts.setOrder(1);
+			ts.setSid(or.getSid());
+			tslist.add(ts);
+			index++;
+		}
+
+		boolean ifsiganlTriggered = false;
+//			boolean ifsiganlTriggered = false;
+		for(TriggerSet ts:tslist){
+			if(sid==ts.getSid()){
+				ifsiganlTriggered = true;
+				break;
+			}
+		}
+
+		return ifsiganlTriggered;
+
+	}
+
 	//判断一个筛选过的historydata中是否含有一整个triggerset序列
 	public TriggerReturn historydatalistContainsTriggerset(List<HistoryData> hdlist,List<TriggerSet> tslist){
 		TriggerReturn tr = new TriggerReturn();
@@ -370,6 +410,4 @@ public class EventDeterminer {
 		}
 		return res;
 	}
-	
-	
 }

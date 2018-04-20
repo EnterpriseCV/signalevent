@@ -1,6 +1,8 @@
 package nju.zxl.signalevent.util;
 
 
+import nju.zxl.signalevent.eo.HistoryData;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
@@ -257,6 +259,10 @@ public class DaoUtils {
             connection.setAutoCommit(false);
             Class clazz = list.get(0).getClass();
             String tablename = clazz.getSimpleName();
+            switch (tablename.toLowerCase()){
+                case "andrule":tablename="and_rule";break;
+                case "orrule":tablename="or_rule";break;
+            }
             sql.append("insert into `"+tablename+"`");
 
             Field[] fls = clazz.getDeclaredFields();
@@ -276,12 +282,91 @@ public class DaoUtils {
             }
             sql.append(")");
             preparedStatement = connection.prepareStatement(sql.toString());
+
+            int stcount = 0;
             for(Object o:list){
                 for(int i=0;i<fls.length;i++){
                     fls[i].setAccessible(true);
                     preparedStatement.setObject(i+1,fls[i].get(o));
                 }
                 preparedStatement.addBatch();
+                stcount++;
+                if(stcount>500){
+                    stcount=0;
+                    preparedStatement.executeBatch();
+                }
+            }
+            preparedStatement.executeBatch();
+            connection.commit();
+            connection.setAutoCommit(true);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            DbUtils.releaseDB(null, preparedStatement, connection);
+        }
+    }
+
+    public boolean insertHistoryDataList(List<HistoryData> list){
+        if(list.size()<1){
+            return false;
+        }
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        StringBuilder sql = new StringBuilder();
+
+        try {
+            connection = DbUtils.getConnection();
+            connection.setAutoCommit(false);
+            Class clazz = list.get(0).getClass();
+            String tablename = "history_data";
+            sql.append("insert into `"+tablename+"`");
+
+            Field[] fl = clazz.getDeclaredFields();
+            List<Field> fls = new ArrayList<Field>();
+
+            for(int i=0;i<fl.length;i++){
+                if(fl[i].getName().toLowerCase().equals("id")){
+                    continue;
+                }
+                if(fl[i].getName().toLowerCase().equals("sourceid")){
+                    continue;
+                }
+                if(fl[i].getName().toLowerCase().equals("trigger_tag")){
+                    continue;
+                }
+                fls.add(fl[i]);
+            }
+            sql.append("(");
+            for (int i = 0; i < fls.size(); i++) {
+                if(i>0){
+                    sql.append(",");
+                }
+                sql.append(fls.get(i).getName());
+            }
+            sql.append(") values(");
+            for (int i = 0; i < fls.size(); i++) {
+                if(i>0){
+                    sql.append(",");
+                }
+                sql.append("?");
+            }
+            sql.append(")");
+            preparedStatement = connection.prepareStatement(sql.toString());
+
+            int stcount = 0;
+            for(Object o:list){
+                for(int i=0;i<fls.size();i++){
+                    fls.get(i).setAccessible(true);
+                    preparedStatement.setObject(i+1,fls.get(i).get(o));
+                }
+                preparedStatement.addBatch();
+                stcount++;
+                if(stcount>500){
+                    stcount=0;
+                    preparedStatement.executeBatch();
+                }
             }
             preparedStatement.executeBatch();
             connection.commit();
