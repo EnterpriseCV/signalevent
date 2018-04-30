@@ -1,6 +1,6 @@
 package nju.zxl.signalevent.controller;
 
-import nju.zxl.signalevent.eo.JudgeResult;
+import nju.zxl.signalevent.model.JudgeResult;
 import nju.zxl.signalevent.service.JudgeEventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

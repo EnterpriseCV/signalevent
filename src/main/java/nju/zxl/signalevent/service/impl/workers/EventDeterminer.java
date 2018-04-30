@@ -6,19 +6,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import nju.zxl.signalevent.eo.HistoryData;
-import nju.zxl.signalevent.eo.*;
+import nju.zxl.signalevent.model.HistoryData;
+import nju.zxl.signalevent.model.*;
 import org.springframework.web.multipart.MultipartFile;
 
 public class EventDeterminer {
 	DataInit datainit;
-	DataOutput dataoutput;
 	DataOperation operation;
 	
 	public EventDeterminer(){
 		operation = new DataOperation();
 		datainit = new DataInit();
-		dataoutput = new DataOutput();
 	}
 	
 	public List<JudgeResult> judgeEvent(MultipartFile file){

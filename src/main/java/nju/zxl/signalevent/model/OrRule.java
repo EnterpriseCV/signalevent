@@ -1,4 +1,4 @@
-package nju.zxl.signalevent.eo;
+package nju.zxl.signalevent.model;
 
 public class OrRule {
     int orid;

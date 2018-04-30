@@ -1,10 +1,10 @@
 package nju.zxl.signalevent.service.impl.workers;
 
 
-import nju.zxl.signalevent.eo.AndRule;
-import nju.zxl.signalevent.eo.Event;
-import nju.zxl.signalevent.eo.HistoryData;
-import nju.zxl.signalevent.eo.OrRule;
+import nju.zxl.signalevent.model.AndRule;
+import nju.zxl.signalevent.model.Event;
+import nju.zxl.signalevent.model.HistoryData;
+import nju.zxl.signalevent.model.OrRule;
 import nju.zxl.signalevent.util.DaoUtils;
 
 import java.util.*;

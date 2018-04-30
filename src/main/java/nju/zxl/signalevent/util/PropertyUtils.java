@@ -17,18 +17,18 @@ public class PropertyUtils {
     static String dbUrl;
     static String dbUserName;
     static String dbPassword;
+    static String modelPackageName;
 
     static {
         try {
             propertie = new Properties();
-            //File file = ResourceUtils.getFile("classpath:"+fileName);
-            //propertie.load(new FileInputStream(file));
             ClassLoader loader = Thread.currentThread().getContextClassLoader();
             propertie.load(loader.getResourceAsStream(fileName));
             dbDriver = propertie.getProperty("dbDriver");
             dbUrl = propertie.getProperty("dbUrl");
             dbUserName = propertie.getProperty("dbUserName");
             dbPassword = propertie.getProperty("dbPassword");
+            modelPackageName = propertie.getProperty("modelPackageName");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -67,4 +67,11 @@ public class PropertyUtils {
         PropertyUtils.dbPassword = dbPassword;
     }
 
+    public static String getModelPackageName() {
+        return modelPackageName;
+    }
+
+    public static void setModelPackageName(String modelPackageName) {
+        PropertyUtils.modelPackageName = modelPackageName;
+    }
 }

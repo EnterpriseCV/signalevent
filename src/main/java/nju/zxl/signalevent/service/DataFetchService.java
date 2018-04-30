@@ -1,7 +1,7 @@
 package nju.zxl.signalevent.service;
 
 
-import nju.zxl.signalevent.eo.OrRule;
+import nju.zxl.signalevent.model.OrRule;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
 package nju.zxl.signalevent.util;
 
 
-import nju.zxl.signalevent.eo.HistoryData;
+import nju.zxl.signalevent.model.HistoryData;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

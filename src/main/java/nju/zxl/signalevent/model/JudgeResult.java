@@ -1,4 +1,4 @@
-package nju.zxl.signalevent.eo;
+package nju.zxl.signalevent.model;
 /**
 *判断结果类
 *@author toti

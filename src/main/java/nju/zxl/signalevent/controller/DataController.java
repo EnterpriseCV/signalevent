@@ -1,6 +1,6 @@
 package nju.zxl.signalevent.controller;
 
-import nju.zxl.signalevent.eo.OrRule;
+import nju.zxl.signalevent.model.OrRule;
 import nju.zxl.signalevent.service.DataEditService;
 import nju.zxl.signalevent.service.DataFetchService;
 import nju.zxl.signalevent.service.DataImportService;
@@ -17,6 +17,7 @@ import java.util.List;
 @RequestMapping("/data")
 public class DataController {
 
+    /*
     @Autowired
     DataFetchService dfs;
 
@@ -84,4 +85,5 @@ public class DataController {
         }
         return orList;
     }
+    */
 }
